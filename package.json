@@ -1,6 +1,6 @@
 {
   "name": "dsh-friends",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.4",
   "type": "module",
   "description": "Friends and community discovery plugin for official DeepSeek Harness.",
   "exports": {
@@ -21,14 +21,14 @@
     "test": "tsx --test tests/*.test.ts"
   },
   "engines": {
-    "node": ">=24",
-    "dsh": "0.2.1-rc.5"
+    "node": ">=22.14",
+    "dsh": "0.2.0-rc.2 || 0.2.1-rc.2 || 0.2.1-rc.5"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "~4.0.5",
-    "@deepseek-ai/dsh-client-connection": "0.2.1-rc.5",
-    "@deepseek-ai/dsh-client-ui-primitives": "0.2.1-rc.5",
-    "@deepseek-ai/dsh-storage-domain": "0.2.1-rc.5"
+    "@deepseek-ai/dsh-client-connection": "0.2.0-rc.2 || 0.2.1-rc.2 || 0.2.1-rc.5",
+    "@deepseek-ai/dsh-client-ui-primitives": "0.2.0-rc.2 || 0.2.1-rc.2 || 0.2.1-rc.5",
+    "@deepseek-ai/dsh-storage-domain": "0.2.0-rc.2 || 0.2.1-rc.2 || 0.2.1-rc.5"
   },
   "dependencies": {
     "@scure/base": "2.0.0",

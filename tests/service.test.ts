@@ -118,3 +118,76 @@ test('corrupt encrypted history stays locked and is never replaced with an empty
   const second=new FriendsService(store,[]);
   try{await assert.rejects(second.command('identity.unlock',{password}),/原文件未覆盖/);assert.equal(second.snapshot().identity,'locked');assert.deepEqual(store.read(),damaged);}finally{await second.close();}
 });
+
+test('public lobby works before identity or friendship, with replies, stable retries and restart recovery',async()=>{
+  const relay=await localRelay(),store=memoryStore();let a=new FriendsService(store,[relay.url]);
+  const guest=new FriendsService(memoryStore(),[relay.url]);
+  try{
+    await guest.command('network.connect',{confirmed:true});
+    assert.equal(guest.snapshot().identity,'missing');assert.equal(relay.events.size,0);
+    await a.command('identity.create',{password,profile:profile('大厅测试甲')});
+    await a.command('network.connect',{confirmed:true});
+    const id=randomUUID();await a.command('lobby.send',{id,text:'公开大厅：第一次参与，不需要加好友。',confirmed:true});
+    await until(()=>guest.snapshot().lobby.length===1);
+    assert.equal(guest.snapshot().friends.length,0);assert.equal(guest.snapshot().identity,'missing');
+    assert.equal(a.snapshot().lobby[0].status,'relay-accepted');
+    assert.equal([...relay.events.values()].filter(e=>e.kind===30388).length,0,'speaking must not opt into full-profile discovery');
+    await assert.rejects(guest.command('lobby.send',{id:randomUUID(),text:'缺少身份',confirmed:true}),/解锁/);
+    await guest.command('identity.create',{password,profile:profile('大厅测试乙')});
+    const parent=a.snapshot().lobby[0].id;
+    await guest.command('lobby.send',{id:randomUUID(),text:'这是对第一句话的回复。',replyTo:parent,confirmed:true});
+    await until(()=>a.snapshot().lobby.length===2);
+    assert.equal(a.snapshot().lobby.find(p=>p.replyTo===parent)?.text,'这是对第一句话的回复。');
+    await a.command('lobby.send',{id,text:'公开大厅：第一次参与，不需要加好友。',confirmed:true});
+    assert.equal([...relay.events.values()].filter(e=>e.kind===9).length,2,'a repeated request is the same event');
+    await assert.rejects(a.command('lobby.send',{id,text:'悄悄改掉同一次请求',confirmed:true}),/内容不一致/);
+    relay.rejectPublishes=true;
+    const retryId=randomUUID(),text='公开消息故障后，重启恢复并只投递一次。';
+    await a.command('lobby.send',{id:retryId,text,confirmed:true});
+    assert.equal(a.snapshot().lobby.find(p=>p.text===text)?.status,'failed');
+    assert.equal(JSON.stringify(store.read()).includes(text),false,'the durable queue is encrypted');
+    const eventId=a.snapshot().lobby.find(p=>p.text===text)!.id;
+    await a.close();a=new FriendsService(store,[relay.url]);relay.rejectPublishes=false;
+    await a.command('identity.unlock',{password});
+    await until(()=>guest.snapshot().lobby.some(p=>p.id===eventId));
+    assert.equal(a.snapshot().pending,0);assert.equal(guest.snapshot().lobby.filter(p=>p.id===eventId).length,1);
+    await guest.command('friend.block',{peer:a.snapshot().publicKey,blocked:true});
+    assert.equal(guest.snapshot().lobby.some(p=>p.publicKey===a.snapshot().publicKey),false);
+    await guest.command('identity.lock',{});
+    assert.equal(guest.snapshot().identity,'locked');
+    await a.command('lobby.send',{id:randomUUID(),text:'锁定身份后仍可只读浏览。',confirmed:true});
+    await until(()=>guest.snapshot().lobby.some(p=>p.text==='锁定身份后仍可只读浏览。'));
+    await guest.command('network.disconnect',{});
+    assert.equal(guest.snapshot().networkApproved,false);
+  }finally{await a.close();await guest.close();await relay.close();}
+});
+
+test('NIP-42 private authentication is scoped, ephemeral and separate from guest public reading',async()=>{
+  const relay=await localRelay({requirePrivateAuth:true}),a=new FriendsService(memoryStore(),[relay.url]),b=new FriendsService(memoryStore(),[relay.url]),guest=new FriendsService(memoryStore(),[relay.url]),refused=new FriendsService(memoryStore(),[relay.url]);
+  try{
+    await guest.command('network.connect',{confirmed:true});assert.equal(relay.authEvents.length,0);
+    await a.command('identity.create',{password,profile:profile('验证甲')});await b.command('identity.create',{password,profile:profile('验证乙')});
+    await a.command('network.connect',{confirmed:true});await b.command('network.connect',{confirmed:true});
+    await until(()=>a.snapshot().relays[0].privateState==='ready'&&b.snapshot().relays[0].privateState==='ready');
+    assert.equal(relay.authEvents.length,2);assert(relay.authEvents.every(e=>e.kind===22242&&e.content===''));
+    assert.equal([...relay.events.values()].some(e=>e.kind===22242),false,'authentication must never be broadcast');
+    await a.command('lobby.send',{id:randomUUID(),text:'公共发言与私聊验证分开。',confirmed:true});await b.command('lobby.send',{id:randomUUID(),text:'不公开完整名片也能准备私聊。',confirmed:true});
+    await until(()=>guest.snapshot().lobby.length===2);assert.equal(guest.snapshot().identity,'missing');
+    const id=randomUUID();await a.command('friend.request',{peer:b.snapshot().publicKey,id,text:'从大厅继续聊'});await until(()=>b.snapshot().invitations.some(i=>i.id===id));await b.command('friend.accept',{id});await until(()=>a.snapshot().friends.length===1);
+    await a.command('message.send',{peer:b.snapshot().publicKey,id:randomUUID(),text:'验证后收到的加密私聊'});await until(()=>b.snapshot().messages.some(m=>m.text==='验证后收到的加密私聊'));
+    assert.equal(a.snapshot().friends[0].name,'验证乙');assert.equal(b.snapshot().friends[0].name,'验证甲');
+    relay.rejectAuth=true;await refused.command('identity.create',{password,profile:profile('被拒验证测试')});await refused.command('network.connect',{confirmed:true});await until(()=>refused.snapshot().relays[0].privateState==='failed');assert.equal(refused.snapshot().relays[0].state,'connected','private authentication failure must not close the public chat subscription');
+    await a.command('lobby.send',{id:randomUUID(),text:'私聊验证失败仍可以看大厅。',confirmed:true});await until(()=>refused.snapshot().lobby.some(p=>p.text==='私聊验证失败仍可以看大厅。'));
+  }finally{await a.close();await b.close();await guest.close();await refused.close();await relay.close();}
+});
+
+test('maintenance drains every durable lobby batch and prepares the inbox after background recovery',async()=>{
+  const relay=await localRelay(),store=memoryStore();let sender=new FriendsService(store,[relay.url]);const reader=new FriendsService(memoryStore(),[relay.url]);
+  try{
+    await reader.command('network.connect',{confirmed:true});await sender.command('identity.create',{password,profile:profile('批次恢复测试')});await sender.command('network.connect',{confirmed:true});relay.rejectPublishes=true;
+    for(let i=0;i<3;i++)await sender.command('lobby.send',{id:randomUUID(),text:'批次恢复消息 '+i,confirmed:true});
+    assert.equal(sender.snapshot().pending,3);await sender.close();relay.rejectPublishes=false;sender=new FriendsService(store,[relay.url]);await sender.command('identity.unlock',{password});
+    const deadline=Date.now()+8000;while(sender.snapshot().pending>0){assert(Date.now()<deadline,'maintenance must drain the remaining batch without more clicks');await new Promise(r=>setTimeout(r,30));}
+    await until(()=>reader.snapshot().lobby.length===3);assert.deepEqual(store.read().inboxUrls,[relay.url]);assert([...relay.events.values()].some(e=>e.kind===10050&&e.pubkey===sender.snapshot().publicKey));
+  }finally{await sender.close();await reader.close();await relay.close();}
+});

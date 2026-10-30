@@ -1,3 +1,4 @@
+import { PLUGIN_VERSION, PLUGIN_REVISION } from './version.js';
 import { randomUUID } from 'node:crypto';
 import { bech32 } from '@scure/base';
 import { z } from 'zod';
@@ -6,7 +7,7 @@ import { encrypt as protect, decrypt as unlock } from 'nostr-tools/nip49';
 import { getConversationKey, encrypt, decrypt } from 'nostr-tools/nip44';
 import { wrapManyEvents, unwrapEvent } from 'nostr-tools/nip59';
 import { RelayTransport } from './relays.js';
-import { CANDIDATE_RELAYS, PROFILE_KIND, PROFILE_TAG, LEASE_SECONDS, storedSchema, profileSchema, privateSchema, emptyPrivate, hexKey, FriendsError, demand, type Store, type Stored, type PrivateData, type Peer, type Snapshot, type Outbox } from './model.js';
+import { CANDIDATE_RELAYS, PROFILE_KIND, PROFILE_TAG, LEASE_SECONDS, LOBBY_KIND, LOBBY_TAG, LOBBY_LIMIT, storedSchema, profileSchema, privateSchema, emptyPrivate, hexKey, FriendsError, demand, type Store, type Stored, type PrivateData, type Peer, type Snapshot, type Outbox } from './model.js';
 
 const eventSchema=z.object({id:hexKey,pubkey:hexKey,created_at:z.number().int().nonnegative(),kind:z.number().int(),tags:z.array(z.array(z.string().max(2048)).max(8)).max(30),content:z.string().max(32_000),sig:z.string().regex(/^[0-9a-f]{128}$/)});
 const announcement=z.object({protocol:z.literal('dsh-friends/1'),profile:profileSchema,visible:z.boolean(),expiresAt:z.number().int()}).strict();
@@ -27,12 +28,19 @@ export class FriendsService {
   private maintaining=false;
   private publishedAt=0;
   private lastError?:string;
+  private publicEvents=new Map<string,Event>();
+  private guestBlocked=new Set<string>();
   constructor(private store:Store, urls:readonly string[]=CANDIDATE_RELAYS){
     this.stored=storedSchema.parse(store.read());
     this.transport=new RelayTransport(urls,event=>{
-      if(this.closed||this.closing||this.receiving>=64||!this.secret)return;
+      if(this.closed||this.closing||this.receiving>=64||(!this.secret&&event.kind!==LOBBY_KIND))return;
       this.receiving++;
       void this.enqueue(()=>this.receive(event)).catch(()=>{this.lastError='收到无法处理的数据，已保留现有数据。';}).finally(()=>this.receiving--);
+    },async event=>{
+      demand(this.stored.networkApproved&&this.secret,'auth-not-approved','请先解锁身份并同意连接。');
+      const relay=event.tags.filter(t=>t[0]==='relay'),challenge=event.tags.filter(t=>t[0]==='challenge');
+      demand(event.kind===22242&&event.content===''&&relay.length===1&&challenge.length===1&&challenge[0][1]?.length<=1024&&urls.some(url=>new URL(url).href===new URL(relay[0][1]).href)&&Math.abs(event.created_at-now())<60,'invalid-auth','中继身份验证请求无效。');
+      return finalizeEvent(event,this.key());
     });
   }
   private enqueue<T>(run:()=>Promise<T>):Promise<T>{
@@ -53,8 +61,14 @@ export class FriendsService {
   private async change(change:(data:PrivateData)=>void){const next=structuredClone(this.data!);change(next);await this.save(this.stored,next);}
   snapshot():Snapshot {
     const t=now(), data=this.data;
+    const publicEvents=new Map(this.publicEvents);
+    for(const operation of data?.lobbyQueue??[])publicEvents.set(operation.event.id,operation.event);
+    const lobby=[...publicEvents.values()].filter(e=>e.created_at>=t-30*86400&&!data?.blocked.includes(e.pubkey)&&!this.guestBlocked.has(e.pubkey)).sort((a,b)=>a.created_at-b.created_at||a.id.localeCompare(b.id)).slice(-LOBBY_LIMIT).map(e=>{
+      const operation=data?.lobbyQueue.find(o=>o.event.id===e.id);
+      return {id:e.id,publicKey:e.pubkey,name:e.tags.find(t=>t[0]==='name')?.[1]?.slice(0,20)||e.pubkey.slice(0,12),text:e.content,createdAt:e.created_at,...(e.tags.find(t=>t[0]==='q')?.[1]?{replyTo:e.tags.find(t=>t[0]==='q')![1]}:{}),...(operation?{status:operation.status,acceptedRelays:operation.acceptedRelays}:{})};
+    });
     const peers=data ? Object.values(data.peers).filter(p=>p.visible&&p.expiresAt>t&&!data.blocked.includes(p.publicKey)).sort((a,b)=>b.updatedAt-a.updatedAt) : [];
-    return structuredClone({identity:!this.stored.vault?'missing':this.secret?'ready':'locked',publicKey:this.stored.publicKey,profile:this.stored.profile,discoverable:this.stored.discoverable,published:this.publishedAt>t-LEASE_SECONDS,networkApproved:this.stored.networkApproved,relays:[...this.transport.status].map(([url,state])=>({url,state})),peers,invitations:data?Object.values(data.invitations).filter(i=>i.state==='pending'&&i.expiresAt>t&&!data.blocked.includes(i.peer)):[],friends:data?data.friends.map(key=>data.peers[key]??{publicKey:key,name:key.slice(0,12),bio:'',tags:[],looking:'',updatedAt:0,expiresAt:0,visible:false,eventId:''}):[],blocked:data?.blocked??[],messages:data?.messages.filter(m=>!data.blocked.includes(m.peer))??[],pending:data?.outbox.length??0,pendingIds:data?.outbox.map(o=>o.id)??[],...(this.lastError?{error:this.lastError}:{})});
+    return structuredClone({runtimeVersion:PLUGIN_VERSION,runtimeRevision:PLUGIN_REVISION,identity:!this.stored.vault?'missing':this.secret?'ready':'locked',publicKey:this.stored.publicKey,profile:this.stored.profile,discoverable:this.stored.discoverable,published:this.publishedAt>t-LEASE_SECONDS,networkApproved:this.stored.networkApproved,relays:[...this.transport.status].map(([url,state])=>({url,state,privateState:this.transport.privateStatus.get(url),...(this.transport.details.get(url)?{detail:this.transport.details.get(url)}:{})})),peers,invitations:data?Object.values(data.invitations).filter(i=>i.state==='pending'&&i.expiresAt>t&&!data.blocked.includes(i.peer)):[],friends:data?data.friends.map(key=>data.peers[key]??{publicKey:key,name:key.slice(0,12),bio:'',tags:[],looking:'',updatedAt:0,expiresAt:0,visible:false,eventId:''}):[],blocked:[...new Set([...(data?.blocked??[]),...this.guestBlocked])],messages:data?.messages.filter(m=>!data.blocked.includes(m.peer))??[],lobby,pending:(data?.outbox.length??0)+(data?.lobbyQueue.filter(o=>o.status!=='relay-accepted').length??0),pendingIds:[...(data?.outbox.map(o=>o.id)??[]),...(data?.lobbyQueue.filter(o=>o.status!=='relay-accepted').map(o=>o.id)??[])],...(this.lastError?{error:this.lastError}:{})});
   }
   async command(endpoint:string,payload:unknown):Promise<unknown>{
     return this.enqueue(async()=>{
@@ -68,6 +82,7 @@ export class FriendsService {
           // Persist the encrypted identity before making the unlocked identity visible.
           await this.store.write(meta);this.stored=meta;this.secret=secret;this.data=emptyPrivate();
         }catch(error){secret.fill(0);throw error;}
+        if(this.stored.networkApproved)await this.connect();
         return this.snapshot();
       }
       if(endpoint==='identity.import'){
@@ -76,6 +91,7 @@ export class FriendsService {
         const secret=this.openVault(p.vault,p.password);
         try{const meta={...this.stored,vault:p.vault,publicKey:getPublicKey(secret)};await this.store.write(meta);this.stored=meta;this.secret=secret;this.data=emptyPrivate();}
         catch(error){secret.fill(0);throw error;}
+        if(this.stored.networkApproved)await this.connect();
         return this.snapshot();
       }
       if(endpoint==='identity.unlock'){
@@ -88,19 +104,12 @@ export class FriendsService {
           let data=emptyPrivate();
           if(this.stored.encryptedData){
             const decoded=JSON.parse(decrypt(this.stored.encryptedData,getConversationKey(secret,this.stored.publicKey!)));
-            privateSchema.parse(decoded);data=decoded;
+            data=privateSchema.parse(decoded);
           }
           this.secret=secret;this.data=data;
         }catch{secret.fill(0);throw new FriendsError('storage-unreadable','本地加密记录无法读取，原文件未覆盖。');}
         if(this.stored.networkApproved)await this.connect();
         return this.snapshot();
-      }
-      this.key();
-      if(endpoint==='identity.backup')return {encryptedBackup:this.stored.vault};
-      if(endpoint==='identity.lock'){this.stop();return this.snapshot();}
-      if(endpoint==='profile.update'){
-        const profile=profileSchema.parse(payload);await this.save({...this.stored,profile});
-        if(this.stored.discoverable)await this.publishProfile();return this.snapshot();
       }
       if(endpoint==='network.connect'){
         const p=z.object({confirmed:z.literal(true)}).strict().parse(payload);void p;
@@ -108,6 +117,30 @@ export class FriendsService {
       }
       if(endpoint==='network.disconnect'){
         await this.save({...this.stored,networkApproved:false,discoverable:false});this.transport.close();this.publishedAt=0;return this.snapshot();
+      }
+      if(endpoint==='friend.block'&&!this.secret){const p=z.object({peer:hexKey,blocked:z.boolean()}).strict().parse(payload);if(p.blocked)this.guestBlocked.add(p.peer);else this.guestBlocked.delete(p.peer);return this.snapshot();}
+      this.key();
+      if(endpoint==='identity.backup')return {encryptedBackup:this.stored.vault};
+      if(endpoint==='identity.lock'){this.stop();if(this.stored.networkApproved)await this.connect();return this.snapshot();}
+      if(endpoint==='lobby.send'){
+        const p=z.object({id:z.string().uuid(),text:z.string().trim().min(1).max(2000),replyTo:hexKey.optional(),confirmed:z.literal(true)}).strict().parse(payload);
+        demand(this.stored.networkApproved,'not-connected','请先连接大厅，草稿保留在输入框中。');
+        const prior=this.data!.lobbyQueue.find(o=>o.id===p.id);
+        if(prior){demand(prior.event.content===p.text&&prior.event.tags.find(t=>t[0]==='q')?.[1]===p.replyTo,'operation-conflict','同一次发言的内容不一致，请刷新后重试。');await this.flushLobby();return this.snapshot();}
+        demand(this.data!.lobbyQueue.filter(o=>o.status!=='relay-accepted').length<50,'queue-full','待发公开消息较多，请连接后重试。');
+        demand(this.data!.lobbyQueue.filter(o=>o.event.created_at>now()-60).length<20,'rate-limited','发言较频繁，请稍后再试。');
+        const tags=[['t',LOBBY_TAG],['name',this.stored.profile.name],['dsh-id',p.id]];
+        if(p.replyTo){const parent=this.publicEvents.get(p.replyTo)??this.data!.lobbyQueue.find(o=>o.event.id===p.replyTo)?.event;demand(parent,'reply-missing','原消息已不在当前记录中，请取消回复后重新发言。');tags.push(['q',parent.id,this.transport.urls[0]??'',parent.pubkey]);}
+        const event=finalizeEvent({kind:LOBBY_KIND,created_at:now(),tags,content:p.text},this.key());
+        await this.change(data=>{data.lobbyQueue=data.lobbyQueue.filter(o=>o.status!=='relay-accepted'||o.event.created_at>now()-30*86400);if(data.lobbyQueue.length>=LOBBY_LIMIT){const index=data.lobbyQueue.findIndex(o=>o.status==='relay-accepted');demand(index>=0,'queue-full','公开消息队列已满。');data.lobbyQueue.splice(index,1);}data.lobbyQueue.push({id:p.id,event,status:'sending',acceptedRelays:[]});});
+        await this.flushLobby();
+        if(this.data!.lobbyQueue.find(o=>o.id===p.id)?.status==='relay-accepted'&&!this.stored.inboxUrls.length)await this.publishInbox();
+        return this.snapshot();
+      }
+      if(endpoint==='lobby.retry'){z.object({}).strict().parse(payload);await this.flushLobby();return this.snapshot();}
+      if(endpoint==='profile.update'){
+        const profile=profileSchema.parse(payload);await this.save({...this.stored,profile});
+        if(this.stored.discoverable)await this.publishProfile();return this.snapshot();
       }
       if(endpoint==='discovery.visibility'){
         const p=z.object({visible:z.boolean(),confirmed:z.literal(true)}).strict().parse(payload);
@@ -123,7 +156,7 @@ export class FriendsService {
         if(this.data!.invitations[p.id])return this.snapshot();
         demand(!Object.values(this.data!.invitations).some(i=>i.peer===p.peer&&i.state==='pending'&&i.expiresAt>now()),'request-pending','已有待处理邀请。');
         await this.queueControl(p.peer,'request',p.id,p.text);
-        await this.flush();return this.snapshot();
+        await this.flushLobby();await this.flush();return this.snapshot();
       }
       if(endpoint==='friend.accept'||endpoint==='friend.ignore'){
         const p=z.object({id:z.string().uuid()}).strict().parse(payload),invitation=this.data!.invitations[p.id];
@@ -150,7 +183,7 @@ export class FriendsService {
         await this.queueControl(p.peer,'text',p.id,p.text);
         await this.flush();return this.snapshot();
       }
-      if(endpoint==='message.retry'){z.object({}).strict().parse(payload);await this.flush();return this.snapshot();}
+      if(endpoint==='message.retry'){z.object({}).strict().parse(payload);await this.flushLobby();await this.flush();return this.snapshot();}
       throw new FriendsError('unknown-command','此操作尚未支持。');
     });
   }
@@ -163,21 +196,41 @@ export class FriendsService {
       return unlock(vault,passphrase);
     }catch(error){if(error instanceof FriendsError)throw error;throw new FriendsError('unlock-failed','口令错误或备份无效，原有数据未改动。');}
   }
+  async start(){if(this.stored.networkApproved)await this.enqueue(()=>this.connect());}
   private async connect(){
-    await this.transport.connect(this.stored.publicKey!);
+    await this.transport.connect(this.secret?this.stored.publicKey:undefined);
     if(![...this.transport.status.values()].includes('connected')){this.lastError='所有社区中继均连接失败；资料与消息保留在本机。';return;}
     this.lastError=undefined;
-    if(this.stored.discoverable)await this.publishProfile();
-    await this.flush();
+    if(this.secret&&this.stored.discoverable)await this.publishProfile();
+    await this.flushLobby();await this.flush();
     if(!this.timer)this.timer=setInterval(()=>{
-      if(!this.secret||!this.stored.networkApproved||this.closed||this.closing||this.maintaining)return;
+      if(!this.stored.networkApproved||this.closed||this.closing||this.maintaining)return;
       this.maintaining=true;
       void this.enqueue(async()=>{
-        await this.transport.connect(this.stored.publicKey!);
-        if(this.stored.discoverable&&this.publishedAt<now()-300)await this.publishProfile();
-        await this.flush();
+        await this.transport.connect(this.secret?this.stored.publicKey:undefined);
+        if(this.secret&&this.stored.discoverable&&this.publishedAt<now()-300)await this.publishProfile();
+        await this.flushLobby();await this.flush();
       }).catch(()=>{this.lastError='社区连接暂不可用，可到设置重新连接。';}).finally(()=>{this.maintaining=false;});
     },5_000);
+  }
+  private async publishInbox(){
+    const urls=this.transport.urls.filter(url=>this.transport.status.get(url)==='connected');
+    if(!urls.length)return;
+    const t=Math.max(now(),this.stored.announcementAt+1);if(t>now()+300)return;
+    await this.save({...this.stored,announcementAt:t});
+    const event=finalizeEvent({kind:10050,created_at:t,tags:urls.map(url=>['relay',url]),content:''},this.key());
+    if((await this.transport.publish(event)).length)await this.save({...this.stored,inboxUrls:urls});
+    else this.lastError='公开发言已发出，私聊接收配置尚未准备好。';
+  }
+  private async flushLobby(){
+    if(!this.secret||!this.stored.networkApproved)return;
+    for(const item of this.data!.lobbyQueue.filter(o=>o.status!=='relay-accepted').slice(0,2)){
+      const accepted=await this.transport.publish(item.event);
+      await this.change(data=>{const row=data.lobbyQueue.find(o=>o.id===item.id);if(row){row.status=accepted.length?'relay-accepted':'failed';row.acceptedRelays=accepted;}});
+      if(!accepted.length)this.lastError='公开发言尚未被中继确认，已保留在本机，可重试。';
+      else if(this.lastError?.startsWith('公开发言'))this.lastError=undefined;
+    }
+    if(!this.stored.inboxUrls.length&&this.data!.lobbyQueue.some(o=>o.status==='relay-accepted'))await this.publishInbox();
   }
   private async publishProfile(){
     const t=Math.max(now(),this.stored.announcementAt+1);
@@ -206,6 +259,7 @@ export class FriendsService {
     if(latest)await this.change(data=>{data.inboxes[peer]={urls,updatedAt:now()};});
     demand(urls.length,'recipient-not-ready','对方尚未配置你已允许连接的私信中继，请稍后重试。');return urls;
   }
+  private knownPublicPeer(key:string):Peer|undefined{const event=[...this.publicEvents.values()].filter(e=>e.pubkey===key).sort((a,b)=>b.created_at-a.created_at)[0];return event?{publicKey:key,name:event.tags.find(t=>t[0]==='name')?.[1]?.trim().slice(0,20)||key.slice(0,12),bio:'',tags:[],looking:'',updatedAt:0,expiresAt:0,visible:false,eventId:event.id}:undefined;}
   private async queueControl(peer:string,type:Outbox['type'],id:string,text:string,requestId?:string){
     demand(this.stored.networkApproved,'not-connected','请先在设置中开启社区连接。');
     demand(this.data!.outbox.length<100,'queue-full','待发消息较多，请恢复连接后重试。');
@@ -214,6 +268,7 @@ export class FriendsService {
     const events=wrapManyEvents({kind:14,created_at:now(),tags:[['p',peer]],content},this.key(),[peer]);
     await this.change(data=>{
       if(data.outbox.some(o=>o.id===id))return;
+      if(!data.peers[peer]){const known=this.knownPublicPeer(peer);if(known&&Object.keys(data.peers).length<500)data.peers[peer]=known;}
       data.outbox.push({id,peer,type,relayUrls,events:events as unknown as Record<string,unknown>[],...(requestId?{requestId}:{})});
       if(type==='request'){
         demand(Object.keys(data.invitations).length<500,'invitations-full','邀请记录已达到首版容量上限。');
@@ -255,7 +310,18 @@ export class FriendsService {
   private async receive(candidate:Event){
     const parsed=eventSchema.safeParse(candidate);if(!parsed.success)return;
     const event=parsed.data;
-    if(!verifyEvent(event)||event.pubkey===this.stored.publicKey)return;
+    if(!verifyEvent(event))return;
+    if(event.kind===LOBBY_KIND){
+      if(!event.tags.some(t=>t[0]==='t'&&t[1]===LOBBY_TAG)||event.created_at>now()+300||event.created_at<now()-30*86400||!event.content.trim()||event.content.length>2000||this.data?.blocked.includes(event.pubkey)||this.guestBlocked.has(event.pubkey))return;
+      const expires=event.tags.find(t=>t[0]==='expiration')?.[1];if(expires!==undefined&&(!/^\d+$/.test(expires)||Number(expires)<=now()))return;
+      const quote=event.tags.find(t=>t[0]==='q');if(quote&&!hexKey.safeParse(quote[1]).success)return;
+      if(this.publicEvents.has(event.id))return;
+      if([...this.publicEvents.values()].filter(e=>e.pubkey===event.pubkey&&e.created_at>now()-60).length>=30)return;
+      this.publicEvents.set(event.id,event);
+      if(this.publicEvents.size>LOBBY_LIMIT){const oldest=[...this.publicEvents.values()].sort((a,b)=>a.created_at-b.created_at||a.id.localeCompare(b.id))[0];this.publicEvents.delete(oldest.id);}
+      return;
+    }
+    if(!this.secret||!this.data||event.pubkey===this.stored.publicKey)return;
     if(event.kind===PROFILE_KIND){
       if(event.created_at>now()+300||!event.tags.some(t=>t[0]==='d'&&t[1]===PROFILE_TAG))return;
       let value;try{value=announcement.parse(JSON.parse(event.content));}catch{return;}
@@ -276,6 +342,7 @@ export class FriendsService {
       await this.change(data=>{data.seen=[...data.seen,`${peer}:${value.id}`].slice(-2000);});return;
     }
     await this.change(data=>{
+      if(!data.peers[peer]){const known=this.knownPublicPeer(peer);if(known&&Object.keys(data.peers).length<500)data.peers[peer]=known;}
       const pending=Object.values(data.invitations).filter(i=>i.peer===peer&&i.state==='pending'&&i.expiresAt>now());
       if(value.type==='request'){
         if(data.friends.includes(peer)||pending.some(i=>i.direction==='incoming')||Object.keys(data.invitations).length>=500)return;

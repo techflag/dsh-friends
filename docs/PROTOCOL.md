@@ -1,21 +1,25 @@
 # 通信草案 · dsh-friends/1
 
-状态：项目自定义协议 v1 的实现草案。已通过两端真实回环中继测试，尚未验收公共中继写入和公网互联。本协议不是 Nostr 官方标准。
+状态：项目自定义协议 v1 的实现草案。已通过真实回环中继及本机独立宿主经公共中继的读写、引用和加密私聊验证；不同物理网络尚未验收。本协议不是 Nostr 官方标准。
 
-## 公共大厅增量方案（尚未实现）
+## 公共大厅（已实现）
 
-产品方向调整为先公共交流，再选择私聊。大厅拟采用 [NIP-C7](https://github.com/nostr-protocol/nips/blob/master/C7.md) 的 kind 9 明文聊天事件与 q 引用回复；以单字母 t 标签 `dsh-friends-lobby-v1` 约定本应用大厅范围，该命名空间是本项目约定，并非官方标准房间标识。真实写入与公网回查仍需验证。
+产品方向调整为先公共交流，再选择私聊。大厅采用 [NIP-C7](https://github.com/nostr-protocol/nips/blob/master/C7.md) 的 kind 9 明文聊天事件与 q 引用回复；以单字母 t 标签 `dsh-friends-lobby-v1` 约定本应用大厅范围，该命名空间是本项目约定，并非官方标准房间标识。真实写入、ACK 和跨宿主收取已验证，不能因此承诺所有中继永远接受。
 
 只读连接不以好友关系或已解锁身份为前置条件。公开发言才需要签名身份；不因此自动发布完整发现名片。收到的大厅消息必须验签、限长、去重、限制数量、尊重本地屏蔽。公开消息和现有加密私聊必须使用不同载体及 UI 提示，发送确认不能混用。
 
-下文与目前 src/ 中已实现的名片/私聊基础对应；不能将离线大厅示例视为协议已经上线。
+大厅为公开文本，与下文的名片/加密私聊载体分开。离线示例和实际网络结果分别记录。
 
 ## 原则与规范来源
 
 - 采用 [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md) 事件、签名和订阅格式，验证事件后再使用。
-- 私聊拟遵循 [NIP-17](https://github.com/nostr-protocol/nips/blob/master/17.md)，使用 [NIP-44](https://github.com/nostr-protocol/nips/blob/master/44.md) 和 [NIP-59](https://github.com/nostr-protocol/nips/blob/master/59.md)。不自造加密算法。
+- 私聊采用 [NIP-17](https://github.com/nostr-protocol/nips/blob/master/17.md)，使用 [NIP-44](https://github.com/nostr-protocol/nips/blob/master/44.md) 和 [NIP-59](https://github.com/nostr-protocol/nips/blob/master/59.md)。不自造加密算法。
 - 需要过期提示时遵循 [NIP-40](https://github.com/nostr-protocol/nips/blob/master/40.md)，仅向支持节点发布；客户端仍独立剔除过期记录。过期不是互联网副本删除保证。
 - 私信接收节点取收件方有效 kind 10050。没有该配置则提示未准备好，不能把发现节点直接当成收件节点。
+
+## 中继身份验证
+
+使用 [NIP-42](https://github.com/nostr-protocol/nips/blob/master/42.md)。只有身份已解锁且用户同意连接，Host 才为候选节点签署 kind 22242、空正文、匹配当前中继 URL 与挑战、时间有效的验证事件。验证不通过 EVENT 广播。公私分开订阅，收到 auth-required 后验证并重新订阅私信；失败不关闭公共聊天。公开状态显示 WebSocket/大厅可用情况，私聊就绪状态另外显示。
 
 ## 发现名片
 
@@ -39,7 +43,7 @@
 
 ## 邀请与好友关系
 
-加密控制消息拟使用版本化 JSON envelope，放在可互操作的私信载体内；正式实现前核对 NIP-17 plain-text 内容限制、应用识别方式和其他客户端的可读退化。
+加密控制消息使用版本化 JSON envelope，封装在 NIP-17 / NIP-59 载体内。双方需支持本项目的控制协议，不能将其宣称为与所有 Nostr 聊天客户端的邀请流程兼容。
 
 ```json
 {

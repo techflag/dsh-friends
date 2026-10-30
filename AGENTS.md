@@ -11,4 +11,8 @@
 - Do not add paid infrastructure, analytics, automatic public announcements or public-relay write tests without task authorization.
 - Update docs when the product, UI or wire protocol changes. Keep proposals separate from verified integration.
 
-- Product direction (2026-10-31): public conversation first. Default Lobby / Messages / Contacts / Me; friendship is optional after interaction. No-identity reading and first-post identity setup are planned native capabilities, not implemented by the offline prototype. Keep existing encrypted private messaging as a later step.
+- Product direction (2026-10-31): public conversation first. Default Lobby / Messages / Contacts / Me; friendship is optional after interaction. No-identity reading and first-post identity setup are now implemented in the native plugin, with public-network acceptance records. Keep existing encrypted private messaging as a later step.
+
+- Current package: 0.1.0-alpha.4. Public kind 9 lobby and NIP-42 private-subscription authentication are implemented. Preserve separate public/private subscriptions and Host-only challenge signing.
+- Chat UI uses left/right bubbles and native theme tokens. Do not regress to a wide log list or move reply controls away from their messages.
+- Public acceptance scripts are opt-in and must never run as part of default tests/CI. Document exact host/platform/network scope; the two-physical-network and dataelement Desktop gates remain open.

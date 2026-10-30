@@ -24,4 +24,5 @@ export async function apply(ctx:Context){
     }catch(error){return response({ok:false,error:{code:error instanceof FriendsError?error.code:'invalid-operation',message:error instanceof FriendsError?error.message:'操作未完成：请核对输入或本地存储；原数据未主动清空。'}},400);}
   }});
   ctx.effect(()=>unregister,'dsh-friends.rpc');
+  void service.start().catch(()=>{});
 }
