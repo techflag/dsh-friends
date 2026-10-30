@@ -1,0 +1,13 @@
+{
+  "name": "dsh-friends-design",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Offline product and UI prototype for the DSH Friends plugin. Not an installable DSH bundle.",
+  "scripts": {
+    "preview": "node scripts/preview.mjs",
+    "test:design": "node tests/design.mjs"
+  },
+  "engines": { "node": ">=20" },
+  "devDependencies": { "@playwright/test": "1.58.2" }
+}
