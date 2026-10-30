@@ -1,7 +1,7 @@
 # DSH Friends / DSH 搭子
 
 - This repository is a standalone plugin for official DeepSeek Harness (DSH). WorkDSH is a compatible host, not a dependency.
-- Current milestone: product / UI / protocol design and an offline interactive prototype. Do not label it an installable or connected plugin.
+- Current milestone: implement the native DSH plugin after the compact design prototype. Clearly distinguish verified Host/Client integration, local-relay testing and unverified public-network behavior.
 - Integrate through public DSH bundle, Host/Client, sidebar and main-panel APIs. Never patch official packages or copy the official conversation UI.
 - Preserve host theme, keyboard access, nested scrolling, narrow-window behavior and lifecycle cleanup.
 - Profile discovery is explicitly opt-in. Never scan installations, publish credentials/workspaces/conversations, or treat nickname as verified identity.

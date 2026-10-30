@@ -1,13 +1,73 @@
 {
-  "name": "dsh-friends-design",
-  "version": "0.0.0",
-  "private": true,
+  "name": "dsh-friends",
+  "version": "0.1.0-alpha.1",
   "type": "module",
-  "description": "Offline product and UI prototype for the DSH Friends plugin. Not an installable DSH bundle.",
+  "description": "Friends and community discovery plugin for official DeepSeek Harness.",
+  "exports": {
+    ".": "./dist/index.js",
+    "./client": "./dist/client.browser.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "cordis.patch.yml",
+    "README.md"
+  ],
   "scripts": {
     "preview": "node scripts/preview.mjs",
-    "test:design": "node tests/design.mjs"
+    "test:design": "node tests/design.mjs",
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts"
   },
-  "engines": { "node": ">=20" },
-  "devDependencies": { "@playwright/test": "1.58.2" }
+  "engines": {
+    "node": ">=24",
+    "dsh": "0.2.1-rc.5"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.0.5",
+    "@deepseek-ai/dsh-client-connection": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-client-ui-primitives": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-storage-domain": "0.2.1-rc.5"
+  },
+  "dependencies": {
+    "@scure/base": "2.0.0",
+    "nostr-tools": "2.25.4",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "4.0.5",
+    "@deepseek-ai/dsh-client-connection": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-client-ui-layout": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-client-ui-primitives": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-client-ui-renderer": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-client-ui-sidebar": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-client-ui-slots": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-storage-domain": "0.2.1-rc.5",
+    "@playwright/test": "1.58.2",
+    "@types/node": "24.10.1",
+    "@types/react": "18.3.27",
+    "@types/ws": "8.18.1",
+    "esbuild": "0.25.12",
+    "react": "18.3.1",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "ws": "8.18.3"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-connection",
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-renderer",
+        "@deepseek-ai/dsh-client-ui-primitives"
+      ]
+    }
+  }
 }

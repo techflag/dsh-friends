@@ -1,6 +1,6 @@
 # 技术设计 · 官方 DSH 独立插件
 
-状态：提案。目标起点 DSH `0.2.1-rc.5`；DSH 和 WorkDSH 都需实测，不承诺所有衍生发行版兼容。
+状态：架构方案与实施记录。独立插件已在官方 DSH `0.2.1-rc.5` Web 接入并操作；公网双端、WorkDSH 与 Desktop 尚未验收。以 [原生接入记录](NATIVE.md) 区分已验证和计划项。
 
 ## 总体结构
 
@@ -59,7 +59,7 @@ Client 不直接连接中继，不接收私钥或无范围的签名能力。Host
 
 1. 独立身份密钥，不复用模型 Key、企业 token 或 DSH 登录凭据。
 2. 必须先验证官方 Host 安全存储能否保存本插件任意密钥，并在 Web/Desktop 下满足隔离与恢复要求。不能仅凭存在 `dsh-credentials` 包就假设适用。
-3. 若没有满足条件的安全存储：阻止自动持久保存私钥。评估官方允许的系统密钥链或口令加密方案，形成独立决策；不降级到 localStorage/plain JSON。
+3. 本轮采用口令加密：NIP-49 保护身份，NIP-44 自加密聊天与关系，密文通过官方 domain 保存。原始私钥只留在 Host 解锁内存，不放 localStorage/plain JSON。备份先校验格式与工作因子，再交给维护中的密码库处理。
 4. 聊天/名片等数据使用宿主提供的插件隔离本地存储；先验证原子写、锁、迁移。首版不自行引入原生 SQLite 模块，减少跨平台 ABI 风险。
 5. 数据分版本：身份描述、资料、关系、屏蔽、线程、消息、待发和去重索引分开。升级先迁移可恢复副本，读取失败不能覆盖为空。
 6. 身份备份与聊天备份分开。换设备导入身份并不保证中继保存着全部消息。
@@ -76,9 +76,11 @@ Client 不直接连接中继，不接收私钥或无范围的签名能力。Host
 
 ## 依赖与部署
 
-正式包拟用 TypeScript、官方 Client React/主题 primitives、经维护的 Nostr 库。Nostr 库版本、浏览器/Node 能力、NIP 测试向量和许可证须验证后锁定；本阶段不安装生产通信依赖。密码学不自行实现。
+正式实现使用 TypeScript、官方 Client React/主题 primitives、nostr-tools 2.25.4、zod 4.4.3 和 @scure/base 2.0.0，依赖已锁定。Host 采用 Node 24。密码保护经过 NIP-49 公开向量验证，两端私聊使用库的 NIP-59/NIP-44 实现。
 
-当前仓库的 package.json 只供离线预览，`private: true`，不冒充正式插件。正式阶段新增 Host/Client 源码、bundle patch、类型声明、构建和纯 DSH 安装测试后再提供可安装产物。
+当前 package.json 提供真实 Host/Client 导出、bundle patch 与 Client 声明，构建后可生成开发验收 `.tgz`。离线设计稿位于 design/，不会打入插件包；正式 Release 仍需通过公网与 Desktop 门槛。
+
+实际 UI 接口使用官方 Connection exact Fetch 路由 `/api/dsh-friends`，继承官方身份与来源检查；Client 使用同源请求。没有创建第二个 Web 后台或占用共享 `/api` 拦截器。
 
 ## 开放风险与验证门槛
 

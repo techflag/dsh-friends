@@ -5,6 +5,8 @@ import { mkdir, writeFile } from 'node:fs/promises';
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || '@playwright/test');
 const base = process.env.PREVIEW_URL || 'http://127.0.0.1:18806';
+const readyUntil=Date.now()+5000;
+for(;;){try{const response=await fetch(base);if(response.ok)break;}catch{}if(Date.now()>readyUntil)throw new Error('Design preview did not start');await new Promise(resolve=>setTimeout(resolve,50));}
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, colorScheme: 'light' });
 const page = await context.newPage();
