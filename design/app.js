@@ -1,6 +1,7 @@
 (() => {
   'use strict';
   const people = window.FRIENDS_FIXTURES;
+  const returning = new URLSearchParams(location.search).get('scenario')==='returning';
   const $ = selector => document.querySelector(selector);
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const paths = {
@@ -22,11 +23,12 @@
   };
   const icon = name => `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[name] || paths.messages}</svg>`;
   const state = {
-    view:'discover', tag:'全部', query:'', onlineOnly:false, page:1, size:6,
+    view:'lobby', tag:'全部', query:'', onlineOnly:false, page:1, size:6,
     profile:{name:'林间', bio:'用 DSH 做点顺手的小工具，期待认识有相同兴趣的朋友。', tags:'插件开发、效率工具'},
-    discoverable:false, network:'normal', requests:['e'], outgoing:new Set(),
-    friends:new Set(people.filter(p => p.friend).map(p => p.id)), blocked:new Set(),
-    selected:'a', unread:new Set(['a','c']), threadOpen:false, messages:{}, drafts:{},
+    discoverable:false, network:'normal', requests:returning?['e']:[], outgoing:new Set(),
+    friends:new Set(returning?people.filter(p => p.friend).map(p => p.id):[]), blocked:new Set(),
+    selected:'a', unread:new Set(returning?['a','c']:[]), threadOpen:false, messages:{}, drafts:{},
+    lobbyPosts:structuredClone(window.FRIENDS_LOBBY_FIXTURES), lobbyReply:null, lobbyDraft:'',
   };
   const footer = () => '';
   const avatar = (p, size='') => `<span class="avatar ${p.tone || 'self'} ${size}" aria-hidden="true">${esc(p.mark || '我')}</span>`;
@@ -45,7 +47,7 @@
   function updateRail() {
     $('#rail-name').textContent = state.profile.name;
     $('#rail-visibility').textContent = state.discoverable ? '演示：允许被发现' : '名片尚未公开';
-    $('#navigation').innerHTML = [['discover','发现搭子'],['messages','消息'],['friends','好友'],['settings','设置']].map(([key,label]) => `<a href="#${key}" class="nav-item ${state.view === key ? 'active' : ''}" ${state.view === key ? 'aria-current="page"' : ''} aria-label="${label}">${icon(key)}<span class="nav-label">${label}</span>${key === 'messages' && state.unread.size ? `<span class="count">${state.unread.size}</span>` : key === 'friends' && state.requests.length ? `<span class="count">${state.requests.length}</span>` : ''}</a>`).join('');
+    $('#navigation').innerHTML = [['lobby','大厅'],['messages','消息'],['friends','联系人'],['settings','我']].map(([key,label]) => `<a href="#${key}" class="nav-item ${state.view === key ? 'active' : ''}" ${state.view === key ? 'aria-current="page"' : ''} aria-label="${label}">${icon(key)}<span class="nav-label">${label}</span>${key === 'messages' && state.unread.size ? `<span class="count">${state.unread.size}</span>` : key === 'friends' && state.requests.length ? `<span class="count">${state.requests.length}</span>` : ''}</a>`).join('');
   }
   function personCard(p) {
     const blocked = state.blocked.has(p.id);
@@ -54,7 +56,7 @@
     return `<article class="person-card" data-person="${p.id}">
       <div class="person-top">${avatar(p)}<div class="person-title"><button class="name-button" data-action="person" data-id="${p.id}">${esc(p.name)}</button><p class="person-role">${esc(p.role)}</p></div></div>
       <div class="person-content"><p class="person-bio">${esc(p.bio)}</p><div class="tags">${p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}<span class="looking-inline">${esc(p.looking)}</span></div></div>
-      <div class="person-actions">${status(p)}<button class="button ${friend ? 'soft' : ''}" data-action="${friend ? 'chat' : 'request'}" data-id="${p.id}" ${pending || blocked ? 'disabled' : ''}>${blocked ? '已屏蔽' : friend ? '聊一聊' : pending ? '已发出邀请' : '加为好友'}</button></div>
+      <div class="person-actions">${status(p)}<button class="button ${friend ? 'soft' : ''}" data-action="${friend ? 'chat' : 'request'}" data-id="${p.id}" ${pending || blocked ? 'disabled' : ''}>${blocked ? '已屏蔽' : friend ? '聊一聊' : pending ? '已发出邀请' : '发起私聊'}</button></div>
     </article>`;
   }
   function matchesPeople() {
@@ -70,6 +72,19 @@
     $('#people-results').innerHTML = current.length ? `<div class="people-list">${current.map(personCard).join('')}</div>` : `<div class="empty">${icon('search')}<h3>还没有找到合适的搭子</h3><p>试试其他关键词，或查看所有兴趣。</p><button class="button" data-action="reset-search">清除筛选</button></div>`;
     $('#pagination').innerHTML = `<span>${results.length ? `第 ${(state.page-1)*state.size+1}–${Math.min(state.page*state.size,results.length)} 位，共 ${results.length} 位` : '0 位搭子'}</span><div class="page-controls" aria-label="发现列表分页"><button data-action="page" data-page="${state.page-1}" aria-label="上一页" ${state.page===1?'disabled':''}>‹</button>${Array.from({length:totalPages},(_,i)=>`<button data-action="page" data-page="${i+1}" aria-label="第 ${i+1} 页" ${state.page===i+1?'aria-current="page"':''}>${i+1}</button>`).join('')}<button data-action="page" data-page="${state.page+1}" aria-label="下一页" ${state.page===totalPages?'disabled':''}>›</button></div>`;
   }
+  function lobby() {
+    function author(post){return post.author==='self'?{name:state.profile.name,mark:'我'}:people.find(p=>p.id===post.author);}
+    const reply=state.lobbyReply?state.lobbyPosts.find(p=>p.id===state.lobbyReply):null;
+    $('#main').innerHTML = `<section class="lobby-page"><header class="page-head"><div><h1>大厅</h1><p class="subtitle">聊聊正在做的事，遇到的问题，或者一个新想法。</p></div><span class="status">公开交流 · 演示</span></header><div class="lobby-stream" aria-label="大厅聊天记录">${state.lobbyPosts.map(post=>{
+      const person=author(post),parent=state.lobbyPosts.find(p=>p.id===post.replyTo);
+      return `<article class="lobby-post" data-post="${post.id}">${avatar(person,'small')}<div class="lobby-post-body"><div class="lobby-post-meta">${post.author==='self'?`<strong>${esc(person.name)}</strong>`:`<button class="name-button" data-action="person" data-id="${post.author}">${esc(person.name)}</button>`}<time>${esc(post.time)}</time><button class="text-button" data-action="lobby-reply" data-id="${post.id}" aria-label="回复${esc(person.name)}">回复</button></div>${parent?`<div class="lobby-quote">回复 ${esc(author(parent).name)}：${esc(parent.text)}</div>`:''}<p>${esc(post.text)}</p>${post.author==='self'?'<small class="muted">本地演示消息，未发布到网络</small>':''}</div></article>`;
+    }).join('')}</div><form id="lobby-composer" class="lobby-composer">${reply?`<div class="lobby-reply-target">回复 ${esc(author(reply).name)}<button class="text-button" type="button" data-action="cancel-lobby-reply">取消回复</button></div>`:''}<label class="sr-only" for="lobby-input">在大厅公开发言</label><textarea id="lobby-input" maxlength="2000" placeholder="分享一个想法，或者接着聊两句…">${esc(state.lobbyDraft)}</textarea><div class="composer-bottom"><small>公开发言 · 不需要先加好友 · 当前为离线演示</small><button class="button primary" type="submit">发言（演示） ${icon('send')}</button></div></form></section>`;
+  }
+  function postToLobby(){
+    const input=$('#lobby-input'),text=input?.value.trim();if(!text)return;
+    state.lobbyPosts.push({id:crypto.randomUUID(),author:'self',text,replyTo:state.lobbyReply,time:new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})});
+    state.lobbyReply=null;state.lobbyDraft='';lobby();$('.lobby-stream').scrollTop=$('.lobby-stream').scrollHeight;$('#lobby-input').focus();
+  }
   function discover() {
     const categories = ['全部','插件开发','效率工具','产品设计','内容创作','教育学习','日常交流'];
     $('#main').innerHTML = `<div class="page">
@@ -81,7 +96,7 @@
     const contacts = people.filter(p=>state.friends.has(p.id));
     if (!contacts.some(p=>p.id===state.selected)) state.selected = contacts[0]?.id;
     const p = contacts.find(p=>p.id===state.selected);
-    $('#main').innerHTML = `<div class="message-page ${state.threadOpen ? 'thread-open' : ''}"><header class="page-head"><div><div class="eyebrow">A CONVERSATION BETWEEN FRIENDS</div><h1>消息</h1><p class="subtitle">和搭子继续聊聊。这里是人与人的私聊。</p></div><div class="mood-line">${icon('lock')}私聊界面预览 · 尚未接入加密通信</div></header><div class="messenger"><aside class="contact-list" aria-label="好友会话"><label class="search">${icon('search')}<input id="contact-search" aria-label="搜索好友会话" placeholder="搜索好友"></label><div class="list-caption">最近会话</div><div id="contacts">${contacts.map(c=>`<button class="contact ${state.selected===c.id?'selected':''}" data-action="select-contact" data-id="${c.id}" aria-label="与${esc(c.name)}聊天">${avatar(c)}<span class="contact-copy"><span class="contact-line"><strong>${esc(c.name)}</strong><small>${esc(c.time || '刚刚')}</small></span><p>${state.blocked.has(c.id)?'已屏蔽':esc(state.messages[c.id]?.at(-1)?.text || c.note || '成为了好友，打个招呼吧。')}</p></span>${state.unread.has(c.id)?'<span class="dot"></span>':''}</button>`).join('') || '<p class="muted">还没有好友，先去发现搭子吧。</p>'}</div></aside>${p ? `<section class="thread" aria-label="与${esc(p.name)}的聊天"><div class="thread-head"><button class="icon-button chat-back" data-action="back-contacts" aria-label="返回会话列表">${icon('chevron')}</button>${avatar(p,'small')}<div><strong>${esc(p.name)}</strong>${status(p)}</div><button class="icon-button" data-action="person" data-id="${p.id}" aria-label="查看${esc(p.name)}的名片">${icon('friends')}</button></div><div class="thread-scroll" id="thread-scroll"></div><div id="compose-area"></div></section>` : '<section class="empty"><h3>从一个新朋友开始</h3><p>接受邀请后，即可在这里交流。</p><button class="button" data-action="discover">发现搭子</button></section>'}</div></div>`;
+    $('#main').innerHTML = `<div class="message-page ${state.threadOpen ? 'thread-open' : ''}"><header class="page-head"><div><div class="eyebrow">A CONVERSATION BETWEEN FRIENDS</div><h1>消息</h1><p class="subtitle">和搭子继续聊聊。这里是人与人的私聊。</p></div><div class="mood-line">${icon('lock')}私聊界面预览 · 尚未接入加密通信</div></header><div class="messenger"><aside class="contact-list" aria-label="好友会话"><label class="search">${icon('search')}<input id="contact-search" aria-label="搜索好友会话" placeholder="搜索好友"></label><div class="list-caption">最近会话</div><div id="contacts">${contacts.map(c=>`<button class="contact ${state.selected===c.id?'selected':''}" data-action="select-contact" data-id="${c.id}" aria-label="与${esc(c.name)}聊天">${avatar(c)}<span class="contact-copy"><span class="contact-line"><strong>${esc(c.name)}</strong><small>${esc(c.time || '刚刚')}</small></span><p>${state.blocked.has(c.id)?'已屏蔽':esc(state.messages[c.id]?.at(-1)?.text || c.note || '成为了好友，打个招呼吧。')}</p></span>${state.unread.has(c.id)?'<span class="dot"></span>':''}</button>`).join('') || '<p class="muted">还没有私聊，先去大厅聊聊吧。</p>'}</div></aside>${p ? `<section class="thread" aria-label="与${esc(p.name)}的聊天"><div class="thread-head"><button class="icon-button chat-back" data-action="back-contacts" aria-label="返回会话列表">${icon('chevron')}</button>${avatar(p,'small')}<div><strong>${esc(p.name)}</strong>${status(p)}</div><button class="icon-button" data-action="person" data-id="${p.id}" aria-label="查看${esc(p.name)}的名片">${icon('friends')}</button></div><div class="thread-scroll" id="thread-scroll"></div><div id="compose-area"></div></section>` : '<section class="empty"><h3>聊得来，再单独聊</h3><p>先在大厅认识有共同话题的人，想继续聊时再发起私聊。</p><button class="button" data-action="lobby">去大厅聊聊</button></section>'}</div></div>`;
     if(p) renderThread();
   }
   function renderThread() {
@@ -107,19 +122,19 @@
   }
   function friends() {
     const list = people.filter(p=>state.friends.has(p.id));
-    $('#main').innerHTML = `<div class="page"><header class="page-head"><div><div class="eyebrow">YOUR CIRCLE, AT YOUR PACE</div><h1>我的好友</h1><p class="subtitle">从有共同兴趣，到有人可以一起交流。</p></div><button class="button" data-action="discover">${icon('plus')}发现新搭子</button></header><div class="section-title"><h2>好友邀请 <span class="muted">${state.requests.length}</span></h2><span class="muted"><small>邀请仅在本次预览内操作</small></span></div>${state.requests.length ? state.requests.map(id=>{const p=people.find(p=>p.id===id);return `<article class="request-card">${avatar(p)}<div class="request-body"><strong>${esc(p.name)}</strong><p>“我也在学做插件，想和你交流一下从哪里开始。”</p><small class="muted">${p.role} · 示例邀请</small></div><div class="inline-actions"><button class="button" data-action="ignore" data-id="${id}">忽略</button><button class="button primary" data-action="accept" data-id="${id}">接受邀请</button></div></article>`;}).join('') : '<div class="empty"><h3>邀请都处理好了</h3><p>新的好友邀请会显示在这里。</p></div>'}<div class="section-title"><h2>全部好友 <span class="muted">${list.length}</span></h2></div><div class="friends-list">${list.map(p=>`<article class="friend-row">${avatar(p)}<div><button class="name-button" data-action="person" data-id="${p.id}">${esc(p.name)}</button><p>${state.blocked.has(p.id)?'已屏蔽':esc(p.role)}</p></div><button class="button" data-action="chat" data-id="${p.id}">聊一聊</button></article>`).join('')}</div>${footer()}</div>`;
+    $('#main').innerHTML = `<div class="page"><header class="page-head"><div><div class="eyebrow">YOUR CIRCLE, AT YOUR PACE</div><h1>联系人</h1><p class="subtitle">从有共同兴趣，到有人可以一起交流。</p></div><button class="button" data-action="discover">${icon('plus')}发现新搭子</button></header><div class="section-title"><h2>私聊申请 <span class="muted">${state.requests.length}</span></h2><span class="muted"><small>邀请仅在本次预览内操作</small></span></div>${state.requests.length ? state.requests.map(id=>{const p=people.find(p=>p.id===id);return `<article class="request-card">${avatar(p)}<div class="request-body"><strong>${esc(p.name)}</strong><p>“我也在学做插件，想和你交流一下从哪里开始。”</p><small class="muted">${p.role} · 示例邀请</small></div><div class="inline-actions"><button class="button" data-action="ignore" data-id="${id}">忽略</button><button class="button primary" data-action="accept" data-id="${id}">接受邀请</button></div></article>`;}).join('') : '<div class="empty"><h3>邀请都处理好了</h3><p>新的好友邀请会显示在这里。</p></div>'}<div class="section-title"><h2>联系人 <span class="muted">${list.length}</span></h2></div><div class="friends-list">${list.map(p=>`<article class="friend-row">${avatar(p)}<div><button class="name-button" data-action="person" data-id="${p.id}">${esc(p.name)}</button><p>${state.blocked.has(p.id)?'已屏蔽':esc(p.role)}</p></div><button class="button" data-action="chat" data-id="${p.id}">聊一聊</button></article>`).join('')}</div>${footer()}</div>`;
   }
   function switchControl(id, checked, label) {
     return `<label class="switch"><input id="${id}" type="checkbox" ${checked?'checked':''} aria-label="${label}"><span></span></label>`;
   }
   function settings() {
-    $('#main').innerHTML = `<div class="page"><header class="page-head"><div><div class="eyebrow">CONNECTED, ON YOUR TERMS</div><h1>连接与隐私</h1><p class="subtitle">是否被发现、与谁交流，都由你决定。</p></div></header><div class="settings-grid"><div><section class="section-card"><h2>我的名片</h2><p class="subtitle">昵称与简介是自己填写的信息，不代表身份认证。</p><form id="profile-form"><div class="form-row">${avatar({mark:'我'},'large')}<div><strong>${esc(state.profile.name)}</strong><p>首版使用文字头像，不加载第三方头像图片。</p></div></div><label class="field">昵称<input name="name" required maxlength="20" value="${esc(state.profile.name)}"></label><label class="field">一句话介绍<textarea name="bio" rows="3" maxlength="160">${esc(state.profile.bio)}</textarea></label><label class="field">我的兴趣<input name="tags" maxlength="60" value="${esc(state.profile.tags)}"><small>用顿号分隔，最多 3 个兴趣。</small></label><button class="button primary" type="submit">保存名片（演示）</button></form></section><section class="section-card"><h2>可见性</h2><p class="subtitle">默认不公开。开启后，共同中继上的其他用户可以看到你的名片。</p><div class="toggle-row"><div><strong>允许其他搭子发现我</strong><small>公开昵称、简介、兴趣和近期活跃时间。正式版会先列出这些信息，由你确认。</small></div>${switchControl('discoverable',state.discoverable,'允许其他搭子发现我')}</div><p class="setting-note">关闭后停止公开活跃公告。过去已发布的名片可能仍被中继或其他人保留，无法保证从互联网彻底删除。</p></section><section class="section-card"><h2>已屏蔽的搭子</h2><p class="subtitle">屏蔽只影响本插件的展示和收取，不会通知对方。</p>${state.blocked.size ? [...state.blocked].map(id=>`<div class="blocked-row"><span>${esc(people.find(p=>p.id===id).name)}</span><button class="text-button" data-action="unblock" data-id="${id}">解除屏蔽</button></div>`).join('') : '<p class="setting-note">还没有屏蔽任何人。</p>'}</section></div><aside><section class="section-card"><h2>社区连接</h2><p class="subtitle">下列是接入候选，当前没有真实连接。</p>${['relay.damus.io','relay.primal.net','nos.lol'].map((r,i)=>`<div class="relay-row"><span>${r}</span><small>${state.network==='offline'?'模拟断开':state.network==='partial'&&i===2?'模拟不可用':'尚未实测'}</small></div>`).join('')}<label class="field"><span>预览网络状态</span><select id="network-state" class="network-select"><option value="normal" ${state.network==='normal'?'selected':''}>正常场景（模拟）</option><option value="partial" ${state.network==='partial'?'selected':''}>部分中继不可用（模拟）</option><option value="offline" ${state.network==='offline'?'selected':''}>全部断开（模拟）</option></select></label><p class="setting-note">可以切换到“全部断开”，再去消息页体验发送失败与重试。</p></section><section class="section-card"><h2>身份与恢复</h2><p class="subtitle">正式版使用本地生成的密钥身份。</p><div class="code">DEMO-ID · 本预览没有生成真实密钥</div><p class="setting-note">私钥保留在 DSH 的 Host 端。备份与导入方案需要验证安全存储后再接入。</p><button class="text-button" data-action="identity-help">了解身份与备份 →</button></section><section class="section-card"><h2>这里会分享什么？</h2><p class="setting-note">仅在你开启后分享公开名片。不会自动分享你的 DSH 对话、文件、模型配置或工作区信息。</p><p class="setting-note">正式版拟采用加密私聊。加密不代表隐藏网络地址，中继仍可能看到连接信息。</p></section></aside></div>${footer()}</div>`;
+    $('#main').innerHTML = `<div class="page"><header class="page-head"><div><div class="eyebrow">CONNECTED, ON YOUR TERMS</div><h1>连接与隐私</h1><p class="subtitle">是否被发现、与谁交流，都由你决定。</p></div></header><div class="settings-grid"><div><section class="section-card"><h2>我的名片</h2><p class="subtitle">昵称与简介是自己填写的信息，不代表身份认证。</p><form id="profile-form"><div class="form-row">${avatar({mark:'我'},'large')}<div><strong>${esc(state.profile.name)}</strong><p>首版使用文字头像，不加载第三方头像图片。</p></div></div><label class="field">昵称<input name="name" required maxlength="20" value="${esc(state.profile.name)}"></label><label class="field">一句话介绍<textarea name="bio" rows="3" maxlength="160">${esc(state.profile.bio)}</textarea></label><label class="field">我的兴趣<input name="tags" maxlength="60" value="${esc(state.profile.tags)}"><small>用顿号分隔，最多 3 个兴趣。</small></label><button class="button primary" type="submit">保存名片（演示）</button></form></section><section class="section-card"><h2>可见性</h2><p class="subtitle">默认不公开。开启后，共同中继上的其他用户可以看到你的名片。</p><div class="toggle-row"><div><strong>允许其他搭子发现我</strong><small>公开昵称、简介、兴趣和近期活跃时间。正式版会先列出这些信息，由你确认。</small></div>${switchControl('discoverable',state.discoverable,'允许其他搭子发现我')}</div><p class="setting-note">关闭后停止公开活跃公告。过去已发布的名片可能仍被中继或其他人保留，无法保证从互联网彻底删除。</p></section><section class="section-card"><h2>已屏蔽的搭子</h2><p class="subtitle">屏蔽只影响本插件的展示和收取，不会通知对方。</p>${state.blocked.size ? [...state.blocked].map(id=>`<div class="blocked-row"><span>${esc(people.find(p=>p.id===id).name)}</span><button class="text-button" data-action="unblock" data-id="${id}">解除屏蔽</button></div>`).join('') : '<p class="setting-note">还没有屏蔽任何人。</p>'}</section></div><aside><section class="section-card"><h2>社区连接</h2><p class="subtitle">下列是接入候选，当前没有真实连接。</p>${['relay.damus.io','relay.primal.net','nos.lol'].map((r,i)=>`<div class="relay-row"><span>${r}</span><small>${state.network==='offline'?'模拟断开':state.network==='partial'&&i===2?'模拟不可用':'尚未实测'}</small></div>`).join('')}<label class="field"><span>预览网络状态</span><select id="network-state" class="network-select"><option value="normal" ${state.network==='normal'?'selected':''}>正常场景（模拟）</option><option value="partial" ${state.network==='partial'?'selected':''}>部分中继不可用（模拟）</option><option value="offline" ${state.network==='offline'?'selected':''}>全部断开（模拟）</option></select></label><p class="setting-note">可以切换到“全部断开”，再去消息页体验发送失败与重试。</p></section><section class="section-card"><h2>身份与恢复</h2><p class="subtitle">正式版使用本地生成的密钥身份。</p><div class="code">DEMO-ID · 本预览没有生成真实密钥</div><p class="setting-note">私钥保留在 DSH 的 Host 端。备份与导入方案需要验证安全存储后再接入。</p><button class="text-button" data-action="identity-help">了解身份与备份 →</button></section><section class="section-card"><h2>这里会分享什么？</h2><p class="setting-note">大厅发言是公开内容；私聊单独加密。完整名片只有你选择加入同好名片列表后才发布。DSH 对话、文件、模型配置和工作区不会自动分享。</p><p class="setting-note">正式版拟采用加密私聊。加密不代表隐藏网络地址，中继仍可能看到连接信息。</p></section></aside></div>${footer()}</div>`;
   }
   function render() {
-    state.view = ['discover','messages','friends','settings'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'discover';
+    state.view = ['lobby','discover','messages','friends','settings'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'lobby';
     updateRail();
-    ({discover,messages,friends,settings})[state.view]();
-    document.title = `DSH 搭子 · ${{discover:'发现搭子',messages:'消息',friends:'我的好友',settings:'连接与隐私'}[state.view]} · 设计预览`;
+    ({lobby,discover,messages,friends,settings})[state.view]();
+    document.title = `DSH 搭子 · ${{lobby:'大厅',discover:'发现搭子',messages:'消息',friends:'联系人',settings:'连接与隐私'}[state.view]} · 设计预览`;
   }
   function openDialog(title, body, actions='') {
     const dialog = $('#dialog');
@@ -133,13 +148,16 @@
   function personDialog(id) {
     const p=people.find(p=>p.id===id);
     if(!p)return;
-    openDialog('搭子名片', `<div class="dialog-profile">${avatar(p,'large')}<div><h3>${esc(p.name)}</h3><p>${esc(p.role)}</p>${status(p)}</div></div><p>${esc(p.bio)}</p><div class="tags">${p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="looking">${icon('messages')}${esc(p.looking)}</div><div class="code profile-detail-id">演示标识：demo:friends:${p.id}<br>正式版会展示可核对的完整公钥。</div><p>以上为虚构名片。昵称和头像不代表经过身份认证。</p>`, `<button class="button danger" data-action="${state.blocked.has(id)?'unblock':'block'}" data-id="${id}">${state.blocked.has(id)?'解除屏蔽':'屏蔽'}</button><button class="button primary" data-action="${state.friends.has(id)?'chat':'request'}" data-id="${id}" ${state.outgoing.has(id)?'disabled':''}>${state.friends.has(id)?'聊一聊':state.outgoing.has(id)?'已发出邀请':'加为好友'}</button>`);
+    openDialog('搭子名片', `<div class="dialog-profile">${avatar(p,'large')}<div><h3>${esc(p.name)}</h3><p>${esc(p.role)}</p>${status(p)}</div></div><p>${esc(p.bio)}</p><div class="tags">${p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="looking">${icon('messages')}${esc(p.looking)}</div><div class="code profile-detail-id">演示标识：demo:friends:${p.id}<br>正式版会展示可核对的完整公钥。</div><p>以上为虚构名片。昵称和头像不代表经过身份认证。</p>`, `<button class="button danger" data-action="${state.blocked.has(id)?'unblock':'block'}" data-id="${id}">${state.blocked.has(id)?'解除屏蔽':'屏蔽'}</button><button class="button primary" data-action="${state.friends.has(id)?'chat':'request'}" data-id="${id}" ${state.outgoing.has(id)?'disabled':''}>${state.friends.has(id)?'聊一聊':state.outgoing.has(id)?'已发出邀请':'发起私聊'}</button>`);
   }
   document.addEventListener('click', event => {
     const button = event.target.closest('[data-action]');
     if(!button || button.disabled)return;
     const action=button.dataset.action, id=button.dataset.id;
     if(action==='close-dialog')return $('#dialog').close();
+    if(action==='lobby'){ $('#dialog').close();return navigate('lobby'); }
+    if(action==='lobby-reply'){state.lobbyReply=id;lobby();$('#lobby-input').focus();return;}
+    if(action==='cancel-lobby-reply'){state.lobbyReply=null;lobby();return;}
     if(action==='settings' || action==='discover')return navigate(action);
     if(action==='profile'){ $('#dialog').close();navigate('settings');return; }
     if(action==='person')return personDialog(id);
@@ -151,7 +169,7 @@
     if(action==='request'){
       if(state.blocked.has(id))return;
       const p=people.find(p=>p.id===id);
-      return openDialog(`认识一下${esc(p.name)}`, `<p>附上一句介绍，对方接受后再开始聊天。</p><form id="request-form" data-id="${id}"><label class="field">打个招呼<textarea name="greeting" rows="3" maxlength="120" required placeholder="你好，看到你也在用 DSH，想和你交流一下…"></textarea></label><small class="muted">设计预览：邀请只记录在本次页面中，不会真实发送。</small><div class="dialog-actions"><button class="button" type="button" data-action="close-dialog">取消</button><button class="button primary" type="submit">发送邀请（演示）</button></div></form>`);
+      return openDialog(`认识一下${esc(p.name)}`, `<p>附上一句介绍，对方同意后，再单独聊聊刚才的话题。</p><form id="request-form" data-id="${id}"><label class="field">打个招呼<textarea name="greeting" rows="3" maxlength="120" required placeholder="你好，看到你也在用 DSH，想和你交流一下…"></textarea></label><small class="muted">设计预览：邀请只记录在本次页面中，不会真实发送。</small><div class="dialog-actions"><button class="button" type="button" data-action="close-dialog">取消</button><button class="button primary" type="submit">发送私聊申请（演示）</button></div></form>`);
     }
     if(action==='accept'){state.friends.add(id);state.requests=state.requests.filter(x=>x!==id);render();toast('已在演示中成为好友，可以开始聊天。');return;}
     if(action==='ignore'){state.requests=state.requests.filter(x=>x!==id);render();toast('已忽略演示邀请。');return;}
@@ -168,6 +186,7 @@
   });
   document.addEventListener('input',event=>{
     if(event.target.id==='people-search'){state.query=event.target.value;state.page=1;renderDiscoveryResults();}
+    if(event.target.id==='lobby-input')state.lobbyDraft=event.target.value;
     if(event.target.id==='message-input')state.drafts[state.selected]=event.target.value;
     if(event.target.id==='contact-search'){
       const query=event.target.value.trim().toLowerCase();
@@ -189,6 +208,7 @@
     }
   });
   document.addEventListener('submit',event=>{
+    if(event.target.id==='lobby-composer'){event.preventDefault();postToLobby();}
     if(event.target.id==='composer'){event.preventDefault();sendMessage();}
     if(event.target.id==='profile-form'){
       event.preventDefault();const data=new FormData(event.target);const name=String(data.get('name')).trim();
@@ -201,9 +221,10 @@
     }
   });
   document.addEventListener('keydown',event=>{
+    if(event.target.id==='lobby-input' && event.key==='Enter' && !event.shiftKey && !event.isComposing){event.preventDefault();postToLobby();}
     if(event.target.id==='message-input' && event.key==='Enter' && !event.shiftKey && !event.isComposing){event.preventDefault();sendMessage();}
   });
-  $('#intro-button').addEventListener('click',()=>openDialog('在 DSH 里，认识一个新搭子',`<div class="step-caption">首次使用 · 交互流程预览</div><div class="intro-steps"><div class="intro-step"><span class="step-index">1</span><div><strong>创建属于你的身份</strong><p>正式版在本地生成身份，先备份，再开始使用。不需要 WorkDSH 企业账号。</p></div></div><div class="intro-step"><span class="step-index">2</span><div><strong>写一张简单的名片</strong><p>一个昵称、几个兴趣，告诉别人你想交流什么。</p></div></div><div class="intro-step"><span class="step-index">3</span><div><strong>由你决定是否被发现</strong><p>默认不公开。看清会发布哪些信息，再主动开启。</p></div></div></div><p>当前是离线设计原型：没有生成身份、没有连接中继，操作后刷新即可重置。</p>`, '<button class="button" data-action="close-dialog">先逛逛</button><button class="button primary" data-action="profile">体验填写名片 →</button>'));
+  $('#intro-button').addEventListener('click',()=>openDialog('先聊起来，再认识彼此',`<div class="intro-steps"><div class="intro-step"><span class="step-index">1</span><div><strong>先看看大厅在聊什么</strong><p>不用先找人或加好友，也可以只看不说。</p></div></div><div class="intro-step"><span class="step-index">2</span><div><strong>有共鸣，就跟一句</strong><p>回复一个问题、说说你的想法。正式版在首次发言时再设置昵称与本地身份。</p></div></div><div class="intro-step"><span class="step-index">3</span><div><strong>想继续聊，再转私聊</strong><p>从具体话题认识一个人，联系人关系放在后面。</p></div></div></div><p>当前是离线设计原型，所有人物和发言均为虚构演示。</p>`, '<button class="button primary" data-action="lobby">去大厅看看 →</button>'));
   window.addEventListener('hashchange',()=>{$('#main').scrollTop=0;render();});
   render();
 })();

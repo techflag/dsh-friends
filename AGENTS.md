@@ -10,3 +10,5 @@
 - Fixtures and simulated actions must remain visibly labelled. Tests use synthetic identities and data.
 - Do not add paid infrastructure, analytics, automatic public announcements or public-relay write tests without task authorization.
 - Update docs when the product, UI or wire protocol changes. Keep proposals separate from verified integration.
+
+- Product direction (2026-10-31): public conversation first. Default Lobby / Messages / Contacts / Me; friendship is optional after interaction. No-identity reading and first-post identity setup are planned native capabilities, not implemented by the offline prototype. Keep existing encrypted private messaging as a later step.

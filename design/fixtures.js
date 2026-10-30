@@ -13,3 +13,11 @@ window.FRIENDS_FIXTURES = [
   { id:'k', name:'拾光', mark:'拾', tone:'sand', role:'自由职业者', bio:'让工具贴合自己，而不是反过来。欢迎聊聊你正在解决的小问题。', tags:['内容创作','日常交流'], looking:'交流自由职业工作流', online:true, seen:'近期在线', friend:false },
   { id:'l', name:'Luna', mark:'L', tone:'lilac', role:'前端开发者', bio:'享受把草图变成能用的界面，最近对可访问性很感兴趣。', tags:['插件开发','产品设计'], looking:'一起打磨插件体验', online:true, seen:'近期在线', friend:false },
 ];
+
+window.FRIENDS_LOBBY_FIXTURES = [
+  { id:'l1', author:'a', time:'14:20', text:'我刚把每天整理资料的步骤做成了小插件。大家最近在用 DSH 做什么？' },
+  { id:'l2', author:'b', time:'14:22', text:'我想做一个能反复使用的旅行管理工具。每次出门都重新开表格，真的有点累。', replyTo:'l1' },
+  { id:'l3', author:'c', time:'14:23', text:'同感！我希望先看到所有旅行，再点进某一趟安排日程，回来后还能留着做记录。', replyTo:'l2' },
+  { id:'l4', author:'f', time:'14:25', text:'我在试着整理备课资料。还没开始做插件，先来看看大家的想法。' },
+  { id:'l5', author:'a', time:'14:26', text:'先说想解决什么就好。我也是从一个每天都要重复的小问题开始的。', replyTo:'l4' },
+];

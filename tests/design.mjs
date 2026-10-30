@@ -15,8 +15,11 @@ page.on('pageerror', e => errors.push(e.message));
 page.on('request', request => { if (!request.url().startsWith(base) && !request.url().startsWith('data:')) outbound.push(request.url()); });
 async function check(name, fn) { await fn(); checks.push(name); console.log(`PASS ${name}`); }
 async function nav(name) {
-  await page.getByRole('link', { name, exact: true }).click();
-  await page.getByRole('heading', { name: ({ '发现搭子':'发现搭子', '好友':'我的好友', '设置':'连接与隐私', '消息':'消息' })[name], exact:true }).waitFor();
+  if(name==='发现搭子'){
+    await page.getByRole('link', { name:'联系人', exact:true }).click();
+    await page.getByRole('button', { name:'发现新搭子', exact:true }).click();
+  }else await page.getByRole('link', { name:({'好友':'联系人','设置':'我'})[name]||name, exact:true }).click();
+  await page.getByRole('heading', { name: ({ '发现搭子':'发现搭子', '好友':'联系人', '设置':'连接与隐私', '消息':'消息' })[name], exact:true }).waitFor();
 }
 async function shot(name) {
   await page.evaluate(() => Promise.all(document.getAnimations().map(animation => animation.finished.catch(() => {}))));
@@ -26,6 +29,27 @@ try {
   await mkdir('docs/images', { recursive: true });
   await mkdir('.artifacts', { recursive: true });
   await page.goto(base);
+  await check('new visitors enter public conversation with zero contacts and can reply without friendship',async()=>{
+    await page.getByRole('heading',{name:'大厅',exact:true}).waitFor();
+    assert.equal(await page.locator('.lobby-post').count(),5);
+    assert.equal(await page.getByRole('button',{name:'发起私聊',exact:true}).count(),0);
+    await shot('lobby-light');
+    await page.getByRole('textbox',{name:'在大厅公开发言'}).fill('还在写的公开草稿');
+    await page.getByRole('button',{name:'回复小满',exact:true}).click();
+    assert.equal(await page.getByRole('textbox',{name:'在大厅公开发言'}).inputValue(),'还在写的公开草稿');
+    await page.getByRole('textbox',{name:'在大厅公开发言'}).fill('我也想先聊聊这个问题。');
+    await page.getByRole('button',{name:'发言（演示）'}).click();
+    assert.equal(await page.locator('.lobby-post').count(),6);
+    assert.equal(await page.locator('.lobby-post').last().locator('.lobby-quote').count(),1);
+    await page.getByRole('link',{name:'联系人',exact:true}).click();
+    assert.equal(await page.locator('.friend-row').count(),0);
+    await page.getByRole('link',{name:'消息',exact:true}).click();
+    await page.getByRole('button',{name:'去大厅聊聊',exact:true}).click();
+    await page.getByLabel('预览主题').selectOption('dark');await shot('lobby-dark');
+    await page.getByLabel('预览主题').selectOption('light');await page.setViewportSize({width:390,height:844});await shot('lobby-mobile');
+    await page.setViewportSize({width:1280,height:900});await page.getByLabel('预览主题').selectOption('system');
+  });
+  await page.goto(base+'/?scenario=returning#discover');
   await check('discovery is explicitly a fixture, paginated without losing people', async () => {
     assert.equal(await page.locator('.person-card').count(), 6);
     const first = await page.locator('.person-card').first().getAttribute('data-person');
@@ -57,9 +81,9 @@ try {
     await nav('发现搭子');
   });
   await check('invitation has introduction and a non-repeating pending action', async () => {
-    await page.locator('[data-person="b"]').getByRole('button', { name: '加为好友' }).click();
+    await page.locator('[data-person="b"]').getByRole('button', { name: '发起私聊' }).click();
     await page.getByLabel('打个招呼').fill('想交流一下产品设计。');
-    await page.getByRole('button', { name: '发送邀请（演示）' }).click();
+    await page.getByRole('button', { name: '发送私聊申请（演示）' }).click();
     assert.equal(await page.locator('[data-person="b"]').getByRole('button', { name: '已发出邀请' }).isDisabled(), true);
   });
   await check('accepting a request adds a friend and opens an ordinary human chat', async () => {
@@ -106,7 +130,7 @@ try {
     assert.equal(await page.locator('#message-input').count(), 1);
   });
   // Fresh state for accurate, uncluttered screenshots.
-  await page.goto(base);
+  await page.goto(base+'/?scenario=returning#discover');
   await shot('discover-light');
   await check('dark and system themes update the whole surface', async () => {
     await page.getByLabel('预览主题').selectOption('dark');
