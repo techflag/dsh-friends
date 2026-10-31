@@ -1,0 +1,166 @@
+/* Shared prototype visual language. These are the authoritative UI roles. */
+:root{
+ --ui-nav-top:#350448;--ui-nav-start:#481961;--ui-nav-mid:#54216b;--ui-nav-end:#753477;
+ --ui-action:#75408d;--ui-action-hover:#623176;--ui-action-pressed:#512463;--ui-action-soft:#f3edf7;
+ --ui-surface:#fff;--ui-surface-soft:#f8f6fa;--ui-text:#27212c;--ui-text-secondary:#706776;--ui-text-muted:#867a8e;
+ --ui-border:#e8e2ec;--ui-input-border:#cfc5d6;--ui-danger:#b13d50;--ui-danger-soft:#fff1f3;--ui-success:#2e775a;--ui-warning:#956728;
+ --ui-disabled-bg:#eeebf0;--ui-disabled-text:#a19aa6;--ui-focus:0 0 0 3px #75408d24;
+ --ui-radius-control:7px;--ui-radius-card:10px;--ui-radius-panel:12px;
+ --accent:var(--ui-action);--accent-hover:var(--ui-action-hover);--tint:var(--ui-action-soft);--ink:var(--ui-text);--muted:var(--ui-text-secondary);--line:var(--ui-border);--surface:var(--ui-surface);--subtle:var(--ui-surface-soft);--warning:var(--ui-warning)
+}
+:is(#main,#dialog){color:var(--ui-text)}
+:is(#main,#dialog) :is(.button,.icon-button){font:500 12px/1.5 "PingFang SC","Microsoft YaHei",sans-serif;min-height:34px;border:1px solid var(--ui-input-border);border-radius:var(--ui-radius-control);padding:6px 12px;background:var(--ui-surface);color:var(--ui-text);box-shadow:none;transition:background .12s,border-color .12s,color .12s}
+:is(#main,#dialog) .button.primary:not(.slack-send-icon){background:var(--ui-action);border-color:var(--ui-action);color:white}
+:is(#main,#dialog) .button.primary:not(.slack-send-icon):hover:not(:disabled){background:var(--ui-action-hover);border-color:var(--ui-action-hover)}
+:is(#main,#dialog) .button.primary:not(.slack-send-icon):active:not(:disabled){background:var(--ui-action-pressed);border-color:var(--ui-action-pressed)}
+:is(#main,#dialog) :is(.button,.icon-button):not(.primary):hover:not(:disabled){background:var(--ui-surface-soft);border-color:#b5a0c0}
+:is(#main,#dialog) .button.danger{color:var(--ui-danger);border-color:#e9bec8;background:var(--ui-surface)}
+:is(#main,#dialog) .button.danger:hover:not(:disabled){background:var(--ui-danger-soft);border-color:var(--ui-danger)}
+:is(#main,#dialog) .text-button{color:var(--ui-action);border-radius:5px;font-size:12px;background:transparent}
+:is(#main,#dialog) .text-button:hover:not(:disabled){background:var(--ui-action-soft)}
+:is(#main,#dialog) :is(.button,.icon-button):disabled{background:var(--ui-disabled-bg);border-color:var(--ui-disabled-bg);color:var(--ui-disabled-text);opacity:1;cursor:default}
+:is(#main,#dialog) .slack-send-icon{display:grid;place-items:center;min-height:32px;width:34px;height:34px;padding:0;background:transparent;color:var(--ui-action);border:0;border-radius:var(--ui-radius-control)}
+:is(#main,#dialog) .slack-send-icon:hover:not(:disabled){background:var(--ui-action-soft);color:var(--ui-action-hover)}
+:is(#main,#dialog) .slack-send-icon:disabled{background:transparent;border:0;color:var(--ui-disabled-text);opacity:1}
+:is(#main,#dialog) :is(button,a,input,select,textarea):focus-visible{outline:2px solid var(--ui-action);outline-offset:2px;box-shadow:var(--ui-focus)}
+:is(#main,#dialog) .field :is(input,textarea),:is(#main,#dialog) .search{border-color:var(--ui-input-border);border-radius:var(--ui-radius-control);background:var(--ui-surface);color:var(--ui-text)}
+:is(#main,#dialog) :is(input,textarea)::placeholder{color:var(--ui-text-muted)}
+:is(#main,#dialog) :is(.section-card,.discovery,.request-card,.friend-row){border-color:var(--ui-border);border-radius:var(--ui-radius-card)}
+:is(#main,#dialog) .switch input:checked+span{background:var(--ui-action)}
+:is(#main,#dialog) :is(.slack-replies,.slack-mention){color:var(--ui-action)}
+:is(#main,#dialog) .slack-mention{background:var(--ui-action-soft)}
+:is(#main,#dialog) .contact.selected,:is(#main,#dialog) .page-controls button[aria-current=page]{background:var(--ui-action-soft);color:var(--ui-action)}
+:is(#main,#dialog) .lobby-composer,:is(#main,#dialog) #room-thread-composer,:is(#main,#dialog) .composer{border-color:var(--ui-input-border);border-radius:var(--ui-radius-panel);background:var(--ui-surface)}
+:is(#main,#dialog) .lobby-composer:focus-within,:is(#main,#dialog) #room-thread-composer:focus-within,:is(#main,#dialog) .composer:focus-within{border-color:var(--ui-action);box-shadow:var(--ui-focus)}
+:is(#main,#dialog) .empty-symbol{color:#735480;background:var(--ui-surface-soft);border-color:var(--ui-border)}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+#room-thread-composer>textarea{grid-column:1;grid-row:1}#room-thread-composer .slack-send-icon{grid-column:2;grid-row:1}#room-thread-composer .thread-broadcast{grid-column:1/-1;grid-row:2;display:flex;align-items:center;gap:6px;font-size:10px;line-height:1.8;color:var(--ui-text-secondary);padding:4px 0 0;cursor:pointer}#room-thread-composer .thread-broadcast input{margin:0;width:13px;height:13px;accent-color:var(--ui-action);padding:0}.topic-list-item{display:block;text-align:left;width:100%;padding:15px 3px;border-bottom:1px solid var(--ui-border);color:var(--ui-text);font-size:12px}.topic-list-item p{margin:5px 0;font-size:12px;line-height:1.8}.topic-list-item small{color:var(--ui-action);font-size:10px}.topic-list-item:hover{background:var(--ui-surface-soft)}
+/* One primary conversation view and one composer at a time. */
+#main .room-layout.slack-layout.has-thread{grid-template-columns:246px minmax(0,1fr)}#main .has-thread>.slack-thread{grid-column:2;min-height:0;border:0;background:#fff;display:flex}#main .has-thread>.slack-thread>header{height:81px;padding:15px 25px;gap:16px;flex-wrap:wrap}#main .has-thread>.slack-thread>header>[data-action=close-thread]{margin:0;font-size:12px;padding:6px 10px;border:1px solid var(--ui-border);background:#fff;border-radius:6px}#main .has-thread>.slack-thread>header>b{font-size:18px}#main .has-thread>.slack-thread>header>small{font-size:11px;color:var(--ui-text-secondary)}#main .has-thread .slack-thread-history{padding:20px 28px;max-width:1000px;width:100%;margin:0 auto}#main .has-thread .slack-thread-message{padding:12px 0;gap:12px}#main .has-thread .slack-thread-message .avatar{width:36px;height:36px;border-radius:7px}#main .has-thread .slack-thread-message b{font-size:14px}#main .has-thread .slack-thread-message p{font-size:15px;line-height:1.75}#main .has-thread .thread-origin-label{font-size:10px;color:var(--ui-text-muted);margin-bottom:2px}#main .has-thread #room-thread-composer{margin:10px 24px 22px;padding:8px 13px;grid-template-columns:minmax(0,1fr) 38px;gap:4px 10px}#main .has-thread #room-thread-composer textarea{font-size:14px;height:47px;max-height:100px;line-height:1.7}#main .has-thread .thread-broadcast{margin:0;font-size:10px;border-top:1px solid #f4f0f6;padding-top:7px}#main .has-thread .topic-list-item{padding:18px 12px;border-radius:6px}#main .has-thread .topic-list-item p{font-size:14px;line-height:1.8}@media(max-width:1200px){#main .room-layout.slack-layout.has-thread{grid-template-columns:218px minmax(0,1fr)}}@media(max-width:950px){#main .room-layout.slack-layout.has-thread{grid-template-columns:200px minmax(0,1fr)}}@media(max-width:600px){#main .room-layout.slack-layout.has-thread{grid-template-columns:minmax(0,1fr)}#main .has-thread>.slack-thread{grid-column:1}#main .has-thread>.slack-thread>header{height:auto;min-height:77px;padding:12px 15px;gap:8px 12px}#main .has-thread>.slack-thread>header>b{font-size:16px}#main .has-thread>.slack-thread>header>small{font-size:10px}#main .has-thread .slack-thread-history{padding:12px 16px}#main .has-thread .slack-thread-message p{font-size:14px}#main .has-thread #room-thread-composer{margin:6px 12px 14px;padding:8px 11px}#main .has-thread #room-thread-composer textarea{font-size:13px}}
+/* Global destinations are in the rail; channel actions belong to its header. */
+#main .room-list .room-brand::after{display:none}#main .room-list .room-brand{margin-bottom:30px}#main .room-list>h2{font-size:11px;font-weight:500;letter-spacing:.6px;opacity:.8;margin-bottom:13px}#main .room-note>small{display:block;font-size:9px;opacity:.6;margin-top:16px}#main .slack-channel-tabs{align-items:stretch;gap:19px}#main .slack-channel-tabs>button{padding:0 3px;border:0;border-bottom:2px solid transparent;color:var(--ui-text-secondary);font-size:12px;background:transparent;border-radius:0}#main .slack-channel-tabs>button[aria-current=page]{border-bottom-color:var(--ui-action);color:var(--ui-text);font-weight:600}#main .slack-channel-tabs>button:hover{color:var(--ui-action)}#main .slack-channel-tabs>button>span{font-size:9px;padding:1px 5px;border-radius:4px;background:var(--ui-surface-soft);color:var(--ui-text-muted);margin-left:3px}#main .slack-channel-tabs>small{align-self:center}
+#main .slack-replies{display:inline-flex;align-items:center;gap:6px;padding:3px 5px 3px 0;min-height:24px;font-size:12px;font-weight:550;line-height:18px;border-radius:4px}#main .slack-replies svg{width:15px;height:15px;stroke-width:1.65;flex-shrink:0;vertical-align:middle}#main .slack-replies>span{display:block;line-height:18px}#main .room-reply{display:grid;place-items:center}#main .room-reply svg{width:16px;height:16px;stroke-width:1.75}#main .room-center>.page-head{border-bottom:1px solid var(--ui-border)}
+/* Public rooms are continuous group conversations, with inline quoted replies. */
+#main .flat-room .lobby-stream{padding:10px 24px 22px;overflow-anchor:none}#main .flat-room .lobby-post{display:flex;flex-direction:row;align-items:flex-start;gap:10px;padding:10px 0;margin:0;border-radius:7px;background:none;position:relative}#main .flat-room .lobby-post.mine{flex-direction:row-reverse}#main .flat-room .lobby-post>.avatar{width:34px;height:34px;flex-shrink:0;margin-top:0;border-radius:7px}#main .flat-room .lobby-post-body{flex:none;min-width:0;max-width:76%;text-align:left}#main .flat-room .slack-author{display:flex;align-items:center;gap:9px;margin:0 1px 5px;min-height:17px;line-height:17px}#main .flat-room .slack-author .name-button,#main .flat-room .slack-author>strong{font-size:11px!important;font-weight:500!important;color:var(--ui-text-secondary)!important}#main .flat-room .slack-author time{font-size:10px;color:var(--ui-text-muted)}#main .flat-room .slack-author strong>small{font-size:9px;margin-left:4px;font-weight:400;color:var(--ui-text-muted)}#main .flat-room .mine .slack-author{justify-content:flex-end}#main .flat-room .lobby-bubble{padding:9px 12px;border:1px solid var(--ui-border);border-radius:2px 11px 11px 11px;background:var(--ui-surface-soft);min-width:0}#main .flat-room .mine .lobby-bubble{background:#eee5f5;border-color:#e3d4ec;border-radius:11px 2px 11px 11px}#main .flat-room .lobby-bubble>p{font-size:14px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ui-text)}#main .flat-room .room-reply{position:static;align-self:center;flex-shrink:0;min-width:28px;height:28px;padding:5px!important;box-shadow:none;border:0;background:transparent;opacity:0;margin:16px 0 0;display:grid;place-items:center}#main .flat-room .lobby-post:hover .room-reply,#main .flat-room .lobby-post:focus-within .room-reply{opacity:1}#main .flat-room .room-message-quote{display:flex;flex-direction:column;gap:3px;text-align:left;max-width:100%;width:100%;padding:5px 8px;margin:0 0 7px;border:0;border-left:2px solid #b89bc8;border-radius:3px;background:#ffffff85;color:#83708e}#main .flat-room .room-message-quote b{font-size:10px;font-weight:600}#main .flat-room .room-message-quote span{font-size:11px;line-height:1.6;white-space:normal;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}#main .flat-room .room-message-quote:hover{background:#ffffffd9}#main .flat-room .lobby-reply-target{padding:6px 9px;background:var(--ui-surface-soft)}#main .flat-room .lobby-reply-target>span{min-width:0;flex:1}#main .flat-room .lobby-reply-target b{display:block;font-size:10px;font-weight:600;color:var(--ui-action)}#main .flat-room .lobby-reply-target small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px;color:var(--ui-text-muted);max-width:100%}#main .flat-room .lobby-reply-target>button{font-size:19px;flex-shrink:0;padding:0 5px}#main .flat-room .quote-located .lobby-bubble{outline:2px solid #b190c3;outline-offset:3px}#main .flat-room .room-selected{white-space:nowrap}@media(max-width:600px){#main .flat-room .lobby-stream{padding:10px 12px 18px}#main .flat-room .lobby-post{gap:7px;padding:8px 0}#main .flat-room .lobby-post>.avatar{width:29px;height:29px;border-radius:6px}#main .flat-room .lobby-post-body{max-width:calc(100% - 70px)}#main .flat-room .lobby-bubble{padding:8px 10px}#main .flat-room .lobby-bubble>p{font-size:13px}#main .flat-room .room-reply{min-width:25px;width:25px;opacity:1;padding:4px!important}#main .flat-room .slack-author{gap:6px}#main .flat-room .slack-author time{font-size:9px}}
+@media(hover:none){#main .flat-room .room-reply{opacity:1}}
+/* Direct conversations use the same left/other, right/self convention. */
+#main .message-row{flex-direction:row}#main .message-row.mine{flex-direction:row-reverse}#main .message-row .bubble{padding:9px 12px;border:1px solid var(--ui-border);border-radius:2px 11px 11px 11px;background:var(--ui-surface-soft);color:var(--ui-text)}#main .message-row.mine .bubble{background:#eee5f5;border-color:#e3d4ec;border-radius:11px 2px 11px 11px}#main .message-row .private-author{margin-bottom:5px}#main .message-row .private-author strong{font-size:11px;font-weight:500;color:var(--ui-text-secondary)}#main .message-row.mine .private-author,#main .message-row.mine .message-meta{justify-content:flex-end}
+
+/* Give the conversation the primary share of the window. */
+@media(min-width:601px){
+ .app-shell{grid-template-columns:56px minmax(0,1fr);grid-template-rows:40px minmax(0,1fr)}
+ .plugin-bar{height:40px;padding-left:72px}
+ .plugin-bar .brand{min-width:135px}
+ .slack-global-search{height:28px;width:min(660px,58%)}
+ #navigation{top:40px;width:56px;padding:12px 4px;gap:12px}
+ #navigation .nav-item{width:48px;height:55px;min-height:55px;font-size:10px;gap:5px}
+ #navigation .nav-item svg{width:21px;height:21px}
+ #main .room-layout.slack-layout{grid-template-columns:190px minmax(0,1fr)}
+ #main .slack-layout .room-list{padding:18px 9px 14px}
+ #main .room-list .room-brand{font-size:19px;padding:0 9px;margin-bottom:24px}
+ #main .room-brand small{font-size:10px}
+ #main .room-list>h2{padding:0 9px;font-size:11px;margin-bottom:8px}
+ #main .slack-layout .room-selected{font-size:14px;padding:8px 11px}
+ #main .slack-layout .room-note{padding:0 9px;font-size:9px}
+ #main .flat-room .room-center>.page-head{min-height:58px;padding:9px 22px}
+ #main .flat-room .room-center h1{font-size:20px}
+ #main .flat-room .room-center .subtitle{font-size:11px;margin-top:2px}
+ #main .flat-room .lobby-stream{padding:12px 22px 16px}
+ #main .flat-room .lobby-post{padding:9px 0;gap:11px}
+ #main .flat-room .lobby-post>.avatar{width:36px;height:36px}
+ #main .flat-room .lobby-post-body{max-width:82%}
+ #main .flat-room .slack-author .name-button,#main .flat-room .slack-author>strong{font-size:12px!important}
+ #main .flat-room .slack-author time{font-size:11px}
+ #main .flat-room .lobby-bubble{padding:10px 13px}
+ #main .flat-room .lobby-bubble>p{font-size:16px;line-height:1.65}
+ #main .flat-room .room-message-quote{padding:4px 8px;gap:2px;margin-bottom:6px}
+ #main .flat-room .room-message-quote b{font-size:11px}
+ #main .flat-room .room-message-quote span{font-size:12px;-webkit-line-clamp:1}
+ #main .flat-room .lobby-composer{margin:6px 22px 14px;padding:5px 10px;border-radius:11px}
+ #main .flat-room .lobby-composer textarea{height:42px;min-height:42px;max-height:84px;padding:9px 3px;font-size:15px}
+}
+@media(min-width:601px) and (max-width:950px){
+ #main .room-layout.slack-layout{grid-template-columns:160px minmax(0,1fr)}
+ .plugin-bar .brand{min-width:105px}
+ #main .room-list .room-brand{font-size:17px}
+ #main .room-brand small{font-size:9px}
+ #main .flat-room .lobby-post-body{max-width:calc(100% - 78px)}
+ #main .flat-room .lobby-bubble>p{font-size:15px}
+}
+
+/* Compact chat density: preserve room for conversation rather than message chrome. */
+@media(min-width:601px){
+ #main .flat-room .room-center>.page-head{min-height:48px;padding:7px 20px}
+ #main .flat-room .room-center>.page-head>div:first-child{display:flex;align-items:baseline;gap:14px;min-width:0}
+ #main .flat-room .room-center h1{font-size:18px;white-space:nowrap}
+ #main .flat-room .room-center .subtitle{font-size:11px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ #main .flat-room .lobby-stream{padding:8px 20px 10px}
+ #main .flat-room .lobby-post{padding:5px 0;gap:9px}
+ #main .flat-room .lobby-post>.avatar{width:30px;height:30px;border-radius:6px;margin-top:2px}
+ #main .flat-room .lobby-post-body{max-width:85%}
+ #main .flat-room .slack-author{min-height:16px;line-height:16px;margin-bottom:3px;gap:8px}
+ #main .flat-room .slack-author .name-button,#main .flat-room .slack-author>strong{font-size:11px!important;font-weight:500!important}
+ #main .flat-room .slack-author time{font-size:10px}
+ #main .flat-room .lobby-bubble{padding:6px 10px;border-radius:2px 8px 8px 8px}
+ #main .flat-room .mine .lobby-bubble{border-radius:8px 2px 8px 8px}
+ #main .flat-room .lobby-bubble>p{font-size:14px;line-height:1.5;margin:0}
+ #main .flat-room .room-message-quote{flex-direction:row;align-items:baseline;gap:6px;padding:2px 6px;margin-bottom:4px;max-width:100%;overflow:hidden}
+ #main .flat-room .room-message-quote b{font-size:10px;flex-shrink:0}
+ #main .flat-room .room-message-quote span{display:block;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;line-height:1.5}
+ #main .flat-room .room-reply{margin-top:10px;height:24px;min-width:24px}
+ #main .flat-room .lobby-composer{margin:4px 20px 10px;padding:2px 8px;border-radius:9px;grid-template-columns:30px minmax(0,1fr) 34px}
+ #main .flat-room .lobby-composer textarea{font-size:14px;height:36px;min-height:36px;max-height:72px;padding:6px 3px;line-height:24px}
+ #main .flat-room .slack-input-plus{width:26px;height:26px}
+ #main .message-row{margin-bottom:10px;gap:8px}
+ #main .message-row>.avatar{width:30px;height:30px;border-radius:6px}
+ #main .message-row .bubble{font-size:14px;line-height:1.5;padding:6px 10px}
+ #main .message-row .private-author{margin-bottom:3px}
+ #main .message-row .private-author strong{font-size:11px}
+ #main .composer textarea{font-size:14px}
+}
+@media(min-width:601px) and (max-width:950px){
+ #main .flat-room .lobby-post-body{max-width:calc(100% - 66px)}
+ #main .flat-room .room-center .subtitle{display:none}
+}
+
+/* Names lead identity; timestamps remain secondary without enlarging message rows. */
+#main .flat-room .slack-author .name-button,#main .flat-room .slack-author>strong{font-size:13px!important;font-weight:650!important;color:var(--ui-text)!important}
+#main .flat-room .slack-author{min-height:17px;line-height:17px}
+#main .flat-room .slack-author time{color:#776c7f;font-size:10px}
+#main .flat-room .room-message-quote b{color:#5c3b6c;font-weight:650}
+#main .message-row .private-author strong{font-size:13px;font-weight:650;color:var(--ui-text)}
+
+/* Community navigation above the conversation, without nested left rails. */
+.app-shell{grid-template-columns:minmax(0,1fr);grid-template-rows:42px 38px minmax(0,1fr)}
+.plugin-bar{grid-column:1;grid-row:1;height:42px;padding:0 18px;gap:18px}
+.plugin-bar .brand{min-width:110px}
+.slack-global-search{margin:0;width:min(660px,58%);height:28px}
+#navigation{position:absolute;top:42px;bottom:auto;left:0;width:100%;height:38px;padding:0 15px;display:flex;flex-direction:row;align-items:stretch;justify-content:flex-start;gap:6px;background:#49135c;border:0}
+#navigation .nav-item{width:auto;height:38px;min-height:38px;padding:0 14px;display:flex;flex-direction:row;gap:6px;font-size:12px;border-radius:0;color:#e5d5eb}
+#navigation .nav-item svg{width:16px;height:16px}
+#navigation .nav-item.active{color:#fff;background:#ffffff12;box-shadow:inset 0 -2px #dbc0e6}
+#main{grid-column:1;grid-row:3;padding:0 8px 8px;margin:0;border-radius:0}
+#main .room-layout.slack-layout{grid-template-columns:minmax(0,1fr);grid-template-rows:38px minmax(0,1fr)}
+#main .slack-layout .room-list{display:flex;flex-direction:row;align-items:center;gap:6px;padding:0 17px;background:#f8f5fa;border-bottom:1px solid var(--ui-border);color:var(--ui-text-secondary);overflow-x:auto}
+#main .room-list .room-brand,#main .room-list .room-note{display:none}
+#main .room-list>h2{display:block;margin:0 12px 0 0;padding:0;flex-shrink:0;font-size:11px;letter-spacing:0;color:var(--ui-text-secondary)}
+#main .room-list>h2 small{display:none}
+#main .slack-layout .room-selected{width:auto;margin:0;padding:5px 12px;border-radius:6px;font-size:12px;white-space:nowrap;color:var(--ui-text-secondary)}
+#main .slack-layout .room-selected.active{color:var(--ui-action);background:#ece2f2;box-shadow:none;font-weight:600}
+#main .slack-layout .room-selected:hover:not(.active){background:#eee8f2}
+#main .flat-room .room-center>.page-head{min-height:44px;padding:6px 20px}
+#main .flat-room .lobby-stream{padding:8px max(20px,calc((100% - 1100px)/2)) 10px}
+#main .flat-room .lobby-composer{width:calc(100% - 40px);max-width:1100px;margin:4px auto 10px}
+@media(max-width:600px){
+ .plugin-bar{padding:0 12px;gap:9px}.plugin-bar .brand{min-width:0}
+ .slack-global-search{width:auto;flex:1}
+ #navigation{padding:0 6px;justify-content:space-around}
+ #navigation .nav-item{padding:0 10px;font-size:11px}
+ #main{padding:0 5px 5px}
+ #main .slack-layout .room-list{padding:0 8px;gap:2px}
+ #main .room-list>h2{display:none}
+ #main .slack-layout .room-selected{padding:5px 10px;font-size:11px}
+ #main .flat-room .room-center>.page-head{padding:6px 13px;min-height:43px}
+ #main .flat-room .lobby-stream{padding:8px 12px 10px}
+ #main .flat-room .lobby-composer{width:calc(100% - 24px);margin:4px auto 10px}
+}

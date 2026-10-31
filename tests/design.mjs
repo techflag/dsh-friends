@@ -18,10 +18,12 @@ async function nav(name) {
   if(name==='发现搭子'){
     await page.getByRole('link', { name:'联系人', exact:true }).click();
     await page.getByRole('button', { name:'发现新搭子', exact:true }).click();
-  }else await page.getByRole('link', { name:({'好友':'联系人','设置':'我'})[name]||name, exact:true }).click();
-  await page.getByRole('heading', { name: ({ '发现搭子':'发现搭子', '好友':'联系人', '设置':'连接与隐私', '消息':'消息' })[name], exact:true }).waitFor();
+    assert.equal(await page.locator('#navigation a[aria-current=page]').getAttribute('href'),'#friends');
+  }else await page.getByRole('link', { name:({'好友':'联系人','设置':'我','消息':'私信'})[name]||name, exact:true }).click();
+  await page.getByRole('heading', { name: ({ '发现搭子':'发现搭子', '好友':'联系人', '设置':'连接与隐私', '消息':'私信' })[name], exact:true }).waitFor();
 }
 async function shot(name) {
+  await page.locator('.avatar img').evaluateAll(images=>Promise.all(images.map(image=>image.decode().catch(()=>{}))));
   await page.evaluate(() => Promise.all(document.getAnimations().map(animation => animation.finished.catch(() => {}))));
   await page.screenshot({ path: `docs/images/${name}.png`, fullPage: false });
 }
@@ -30,24 +32,55 @@ try {
   await mkdir('.artifacts', { recursive: true });
   await page.goto(base);
   await check('new visitors enter public conversation with zero contacts and can reply without friendship',async()=>{
-    await page.getByRole('heading',{name:'大厅',exact:true}).waitFor();
-    assert.equal(await page.locator('.lobby-post').count(),5);
-    assert.equal(await page.getByRole('button',{name:'发起私聊',exact:true}).count(),0);
-    await shot('lobby-light');
-    await page.getByRole('textbox',{name:'在大厅公开发言'}).fill('还在写的公开草稿');
-    await page.getByRole('button',{name:'回复小满',exact:true}).click();
-    assert.equal(await page.getByRole('textbox',{name:'在大厅公开发言'}).inputValue(),'还在写的公开草稿');
-    await page.getByRole('textbox',{name:'在大厅公开发言'}).fill('我也想先聊聊这个问题。');
-    await page.getByRole('button',{name:'发言（演示）'}).click();
+    await page.getByRole('heading',{name:'# 大厅',exact:true}).waitFor();
+    assert.deepEqual(await page.locator('#navigation .nav-label').allTextContents(),['社区','私信','联系人','我']);
+    assert.equal(await page.locator('.room-list button').count(),3);
+    assert.equal(await page.locator('.room-list').getByRole('button',{name:/联系人|私信|话题/}).count(),0);
     assert.equal(await page.locator('.lobby-post').count(),6);
-    assert.equal(await page.locator('.lobby-post').last().locator('.lobby-quote').count(),1);
+    assert(await page.locator('.lobby-stream').evaluate(el=>el.scrollHeight<=el.clientHeight+1),'The six demo messages should fit in the desktop conversation viewport');
+    assert.equal(await page.locator('textarea:visible').count(),1);
+    assert.equal(await page.locator('.slack-replies,.slack-thread').count(),0);
+    const mine=await page.locator('.lobby-post.mine').boundingBox(),other=await page.locator('.lobby-post:not(.mine)').first().locator('.lobby-bubble').boundingBox(),own=await page.locator('.lobby-post.mine .lobby-bubble').boundingBox();assert(own.x>other.x);
+    await shot('group-chat-light');await shot('lobby-light');
+    const box=page.getByRole('textbox',{name:'在大厅公开发言'});
+    await box.fill('未发送的公开聊天草稿');
+    await page.getByRole('button',{name:'回复阿树',exact:true}).first().click();
+    assert.equal(await box.inputValue(),'未发送的公开聊天草稿');
+    assert.equal(await page.locator('.lobby-post').count(),6);
+    assert.equal(await page.locator('textarea:visible').count(),1);
+    await box.fill('回复后仍然在同一个房间');
+    await page.getByRole('button',{name:'发言（演示）',exact:true}).click();
+    assert.equal(await page.locator('.lobby-post').count(),7);
+    const quote=page.locator('.lobby-post').last().getByRole('button',{name:'查看阿树的原消息',exact:true});await quote.click();
+    assert.equal(await page.locator('.lobby-post').count(),7);assert.equal(await page.locator('.quote-located').getAttribute('data-post'),'l1');
+    await page.getByRole('button',{name:'回复小满',exact:true}).click();await box.fill('大厅的草稿');
+    await page.locator('.room-list').getByRole('button',{name:/插件交流/}).click();assert.equal(await box.inputValue(),'');
+    await box.fill('插件房间的草稿');await page.locator('.room-list').getByRole('button',{name:/大厅/}).click();
+    assert.equal(await box.inputValue(),'大厅的草稿');assert.equal(await page.getByRole('button',{name:'取消回复',exact:true}).count(),1);
+    await page.getByRole('button',{name:'取消回复',exact:true}).click();assert.equal(await box.inputValue(),'大厅的草稿');await box.fill('');
+    await page.setViewportSize({width:390,height:844});
+    assert.equal(await page.locator('#main').evaluate(e=>e.scrollWidth<=e.clientWidth+1),true);assert.equal(await page.locator('textarea:visible').count(),1);
+    await shot('group-chat-mobile');await page.setViewportSize({width:1280,height:900});
     await page.getByRole('link',{name:'联系人',exact:true}).click();
     assert.equal(await page.locator('.friend-row').count(),0);
-    await page.getByRole('link',{name:'消息',exact:true}).click();
+    await page.getByRole('link',{name:'私信',exact:true}).click();
     await page.getByRole('button',{name:'去大厅聊聊',exact:true}).click();
-    await page.getByLabel('预览主题').selectOption('dark');await shot('lobby-dark');
-    await page.getByLabel('预览主题').selectOption('light');await page.setViewportSize({width:390,height:844});await shot('lobby-mobile');
-    await page.setViewportSize({width:1280,height:900});await page.getByLabel('预览主题').selectOption('system');
+    await shot('lobby-fixed-palette');
+    if(await page.getByRole('button',{name:'返回频道',exact:true}).isVisible())await page.getByRole('button',{name:'返回频道',exact:true}).click();await page.setViewportSize({width:390,height:844});await shot('lobby-mobile');
+    await page.setViewportSize({width:1280,height:900});
+  });
+  await check('empty messages, contacts, settings and discovery share an opaque readable surface',async()=>{
+    await page.goto(base+'/#messages');
+    for(const [name,file]of[['消息','messages-empty-light'],['好友','friends-empty-light'],['设置','settings-default-light'],['发现搭子','discover-default-light']]){
+      await nav(name);
+      assert.equal(await page.locator('#main').evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(255, 255, 255)');
+      assert.equal(await page.locator('h1').evaluate(e=>getComputedStyle(e).color),'rgb(39, 33, 44)');
+      const fills=await page.locator('#main .button.primary:not(.slack-send-icon)').evaluateAll(nodes=>nodes.filter(e=>!e.disabled).map(e=>getComputedStyle(e).backgroundColor));assert(fills.every(color=>color==='rgb(117, 64, 141)'),name+' primary action color differs');
+      await shot(file);
+      await page.setViewportSize({width:390,height:844});
+      assert.equal(await page.locator('#main').evaluate(e=>e.scrollWidth<=e.clientWidth+1),true,name+' empty narrow overflow');
+      await page.setViewportSize({width:1280,height:900});
+    }
   });
   await page.goto(base+'/?scenario=returning#discover');
   await check('discovery is explicitly a fixture, paginated without losing people', async () => {
@@ -96,6 +129,7 @@ try {
     await page.getByRole('button', { name: '与阿树聊天' }).click();
   });
   await check('chat draft survives navigation and handles untrusted text as text', async () => {
+    const mine=await page.locator('.message-row.mine .avatar').first().boundingBox(),other=await page.locator('.message-row:not(.mine) .avatar').first().boundingBox();assert(mine.x>other.x);
     await page.getByRole('textbox', { name: '给阿树发消息' }).fill('未发送的草稿');
     await nav('发现搭子');
     await nav('消息');
@@ -132,15 +166,13 @@ try {
   // Fresh state for accurate, uncluttered screenshots.
   await page.goto(base+'/?scenario=returning#discover');
   await shot('discover-light');
-  await check('dark and system themes update the whole surface', async () => {
-    await page.getByLabel('预览主题').selectOption('dark');
-    assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'dark');
-    await shot('discover-dark');
-    await page.getByLabel('预览主题').selectOption('system');
-    await page.emulateMedia({ colorScheme: 'dark' });
-    const dark = await page.locator('body').evaluate(el => getComputedStyle(el).backgroundColor);
-    await page.emulateMedia({ colorScheme: 'light' });
-    assert.notEqual(await page.locator('body').evaluate(el => getComputedStyle(el).backgroundColor), dark);
+  await check('the fixed community palette stays unchanged when the system switches appearance', async () => {
+    const light=await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor);
+    const header=await page.locator('.plugin-bar').evaluate(el=>getComputedStyle(el).backgroundColor);
+    await page.emulateMedia({colorScheme:'dark'});
+    assert.equal(await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor),light);
+    assert.equal(await page.locator('.plugin-bar').evaluate(el=>getComputedStyle(el).backgroundColor),header);
+    await page.emulateMedia({colorScheme:'light'});
   });
   await nav('消息');
   await page.getByRole('button', { name: '与阿树聊天' }).click();

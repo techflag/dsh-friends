@@ -4,8 +4,8 @@ import { matchFilter, type Filter } from 'nostr-tools/filter';
 import { verifyEvent, type Event } from 'nostr-tools/pure';
 
 /** Actual loopback WebSocket relay. Never forwards to the public network. */
-export async function localRelay(options:{requirePrivateAuth?:boolean}={}){
-  const server=new WebSocketServer({host:'127.0.0.1',port:0});
+export async function localRelay(options:{requirePrivateAuth?:boolean;port?:number}={}){
+  const server=new WebSocketServer({host:'127.0.0.1',port:options.port??0});
   await new Promise<void>(resolve=>server.once('listening',resolve));
   const records=new Map<string,Event>(),subscriptions=new Map<WebSocket,Map<string,Filter[]>>();
   const fixture={url:`ws://127.0.0.1:${(server.address() as {port:number}).port}`,rejectPublishes:false,rejectAuth:false,authEvents:[] as Event[],events:records,attempts:[] as string[],async close(){for(const client of server.clients)client.terminate();await new Promise<void>(resolve=>server.close(()=>resolve()));}};

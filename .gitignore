@@ -1,5 +1,4 @@
 node_modules/
-dist/
 *.tgz
 .artifacts/
 .DS_Store
@@ -7,3 +6,6 @@ dist/
 .env
 .env.*
 !.env.example
+
+# Local user-operated screenshots must not be published.
+/docs/images/native-vertical-local-user.png

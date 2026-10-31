@@ -1,15 +1,27 @@
 import type { Event } from 'nostr-tools/pure';
 import { z } from 'zod';
 
-export const CANDIDATE_RELAYS = ['wss://relay.damus.io', 'wss://relay.primal.net', 'wss://nos.lol'];
+export const CANDIDATE_RELAYS = ['wss://relay.techflag.cn'];
 export const PROFILE_TAG = 'dsh-friends/profile/v1';
 // Experimental public discovery, isolated by d + protocol; not a registered NIP kind.
 // NIP-78 kind 30078 is owner-private and must not be used for public discovery.
 export const PROFILE_KIND = 30388;
 export const LOBBY_KIND = 9;
 export const LOBBY_TAG = 'dsh-friends-lobby-v1';
-export const LOBBY_LIMIT = 200;
-export interface LobbyPost { id:string; publicKey:string; name:string; text:string; createdAt:number; replyTo?:string; status?:'sending'|'relay-accepted'|'failed'; acceptedRelays?:string[]; }
+export const LOBBY_LIMIT = 1000;
+export const ROOMS = [
+  {id:'general',name:'大厅',tag:LOBBY_TAG},
+  {id:'builders',name:'插件交流',tag:'dsh-friends-builders-v1'},
+  {id:'random',name:'随便聊聊',tag:'dsh-friends-random-v1'},
+] as const;
+export type RoomId = typeof ROOMS[number]['id'];
+export const roomIdSchema = z.enum(['general','builders','random']);
+export function eventRoom(event:Pick<Event,'tags'>):RoomId|undefined {
+  const tags=event.tags.filter(t=>t[0]==='t'&&ROOMS.some(r=>r.tag===t[1]));
+  return tags.length===1?ROOMS.find(r=>r.tag===tags[0][1])?.id:undefined;
+}
+export const publicEventSchema=z.object({id:z.string().regex(/^[0-9a-f]{64}$/),pubkey:z.string().regex(/^[0-9a-f]{64}$/),created_at:z.number().int().nonnegative(),kind:z.literal(9),tags:z.array(z.array(z.string().max(2048)).max(8)).max(30),content:z.string().max(2000),sig:z.string().regex(/^[0-9a-f]{128}$/)});
+export interface LobbyPost { id:string; room?:RoomId; publicKey:string; name:string; text:string; createdAt:number; replyTo?:string; status?:'sending'|'relay-accepted'|'failed'; acceptedRelays?:string[]; }
 export interface LobbyOperation { id:string; event:Event; status:'sending'|'relay-accepted'|'failed'; acceptedRelays:string[]; }
 export const LEASE_SECONDS = 900;
 export const hexKey = z.string().regex(/^[0-9a-f]{64}$/);
@@ -19,11 +31,15 @@ export const storedSchema = z.object({
   version:z.literal(1), publicKey:hexKey.optional(), vault:z.string().max(300).optional(),
   profile:profileSchema, discoverable:z.boolean(), networkApproved:z.boolean(),
   encryptedData:z.string().max(8_000_000).optional(),
+  publicHistory:z.array(publicEventSchema).max(900).default([]),
+  localIdentityId:z.string().uuid().optional(),
+  notificationsEnabled:z.boolean().default(false),
+  selectedRoom:roomIdSchema.default('general'),
   inboxUrls:z.array(z.string().max(256)).max(3).default([]),
   announcementAt:z.number().int().nonnegative().default(0),
 }).strict().refine(s=>Boolean(s.publicKey)===Boolean(s.vault),'Incomplete identity');
 export type Stored = z.infer<typeof storedSchema>;
-export const initialStored = ():Stored => ({version:1, profile:{name:'新搭子',bio:'',tags:[],looking:''},discoverable:false,networkApproved:false,announcementAt:0,inboxUrls:[]});
+export const initialStored = ():Stored => ({version:1, profile:{name:'新搭子',bio:'',tags:[],looking:''},discoverable:false,networkApproved:false,announcementAt:0,inboxUrls:[],publicHistory:[],selectedRoom:'general',notificationsEnabled:false});
 export interface Store { read():Stored; write(value:Stored):Promise<void>; }
 export interface Peer extends Profile { publicKey:string; updatedAt:number; expiresAt:number; visible:boolean; eventId:string; }
 export interface Invitation { id:string; peer:string; greeting:string; direction:'incoming'|'outgoing'; state:'pending'|'accepted'|'ignored'; expiresAt:number; }
@@ -40,9 +56,14 @@ export interface Snapshot {
   runtimeVersion:string;runtimeRevision:string;
   identity:'missing'|'locked'|'ready'; publicKey?:string; profile:Profile;
   discoverable:boolean; published:boolean; networkApproved:boolean;
-  relays:{url:string;state:'idle'|'connecting'|'connected'|'failed';privateState?:'idle'|'ready'|'authenticating'|'failed';detail?:string}[];
+  relays:{url:string;state:'idle'|'connecting'|'connected'|'failed';privateState?:'idle'|'ready'|'authenticating'|'failed';route?:string;detail?:string}[];
   peers:Peer[]; invitations:Invitation[]; friends:Peer[]; blocked:string[]; messages:Message[];
   lobby:LobbyPost[];
+  localIdentity:boolean;
+  historyPolicy:'memory-24h'|'relay-defined';
+  notificationsEnabled:boolean;
+  selectedRoom:RoomId;
+  roomHistory:Record<RoomId,{exhausted:boolean;loaded:boolean}>;
   pending:number; pendingIds:string[]; error?:string;
 }
 export class FriendsError extends Error { constructor(readonly code:string, message:string){super(message);} }

@@ -191,3 +191,113 @@ test('maintenance drains every durable lobby batch and prepares the inbox after 
     await until(()=>reader.snapshot().lobby.length===3);assert.deepEqual(store.read().inboxUrls,[relay.url]);assert([...relay.events.values()].some(e=>e.kind===10050&&e.pubkey===sender.snapshot().publicKey));
   }finally{await sender.close();await reader.close();await relay.close();}
 });
+
+test('default rooms isolate live messages, replies, operation IDs and restore their public cache without unlocking',async()=>{
+  const relay=await localRelay(),store=memoryStore();let a=new FriendsService(store,[relay.url]);const b=new FriendsService(memoryStore(),[relay.url]);
+  try{
+    await a.command('identity.create',{password,profile:profile('甲')});
+    await a.command('network.connect',{confirmed:true});await b.command('network.connect',{confirmed:true});
+    await a.command('lobby.send',{id:randomUUID(),text:'大厅旧协议',confirmed:true});
+    const id=randomUUID();await a.command('lobby.send',{id,text:'插件交流消息',room:'builders',confirmed:true});
+    await until(()=>b.snapshot().lobby.length===2);
+    const builder=b.snapshot().lobby.find(p=>p.room==='builders')!;
+    assert.equal(b.snapshot().lobby.filter(p=>p.room==='general').length,1);
+    await assert.rejects(a.command('lobby.send',{id:randomUUID(),text:'不能跨房间回复',room:'random',replyTo:builder.id,confirmed:true}),/原消息/);
+    await assert.rejects(a.command('lobby.send',{id,text:'插件交流消息',room:'random',confirmed:true}),/不一致/);
+    await b.command('room.select',{room:'builders'});
+    await a.command('room.select',{room:'random'});await a.close();
+    a=new FriendsService(store,[]);
+    assert.equal(a.snapshot().identity,'locked');assert.equal(a.snapshot().selectedRoom,'random');
+    assert.equal(a.snapshot().lobby.length,2,'public cache is readable offline without exposing private identity');
+    await assert.rejects(a.command('room.select',{room:'user-room'}));
+  }finally{await a.close();await b.close();await relay.close();}
+});
+
+test('history replays absent-time messages, pages beyond 30 days and keeps same-second boundaries intact',async()=>{
+  const relay=await localRelay(),store=memoryStore();let reader=new FriendsService(store,[relay.url]);
+  const {generateSecretKey,finalizeEvent}=await import('nostr-tools/pure');
+  const secret=generateSecretKey(),t=Math.floor(Date.now()/1000)-40*86400;
+  const seed=(text:string,time:number,tag='dsh-friends-builders-v1')=>{const event=finalizeEvent({kind:9,created_at:time,tags:[['t',tag],['name','历史测试']],content:text},secret);relay.events.set(event.id,event);return event;};
+  for(let i=0;i<75;i++)seed(`同秒历史 ${i}`,t);
+  seed('更早一条',t-10);seed('其他房间',t,'dsh-friends-random-v1');
+  try{
+    await reader.command('network.connect',{confirmed:true});
+    await reader.command('lobby.history',{room:'builders'});
+    assert.equal(reader.snapshot().lobby.filter(p=>p.room==='builders').length,75,'one full timestamp boundary is fetched without skipping tied IDs');
+    await reader.command('lobby.history',{room:'builders'});
+    assert.equal(reader.snapshot().lobby.filter(p=>p.room==='builders').length,76);
+    await reader.command('lobby.history',{room:'builders'});assert.equal(reader.snapshot().roomHistory.builders.exhausted,true);
+    await reader.close();
+    seed('关闭期间的新消息',Math.floor(Date.now()/1000)-10);
+    reader=new FriendsService(store,[relay.url]);await reader.start();
+    await until(()=>reader.snapshot().lobby.some(p=>p.text==='关闭期间的新消息'));
+    assert(reader.snapshot().lobby.some(p=>p.text==='更早一条'),'cached history survives reopening');
+    await reader.command('network.disconnect',{});
+    await assert.rejects(reader.command('lobby.history',{room:'general'}),/先连接/);
+    assert(reader.snapshot().lobby.some(p=>p.text==='关闭期间的新消息'));
+  }finally{await reader.close();await relay.close();}
+});
+
+test('first connection failure automatically recovers when the relay becomes available',async()=>{
+  let relay=await localRelay();const url=relay.url,port=Number(new URL(url).port);await relay.close();
+  const reader=new FriendsService(memoryStore(),[url]);
+  try{
+    await reader.command('network.connect',{confirmed:true});assert.equal(reader.snapshot().relays[0].state,'failed');
+    relay=await localRelay({port});
+    const deadline=Date.now()+8000;
+    while(reader.snapshot().relays[0].state!=='connected'&&Date.now()<deadline)await new Promise(r=>setTimeout(r,50));
+    assert.equal(reader.snapshot().relays[0].state,'connected');assert.equal(reader.snapshot().error,undefined);
+  }finally{await reader.close();await relay.close();}
+});
+
+test('notification feed excludes initial history, own events and blocked senders, and persists opt-in',async()=>{
+  const relay=await localRelay(),store=memoryStore();let reader=new FriendsService(store,[relay.url]);const writer=new FriendsService(memoryStore(),[relay.url]);
+  try{
+    await writer.command('identity.create',{password,profile:profile('提醒测试甲')});await writer.command('network.connect',{confirmed:true});
+    await writer.command('lobby.send',{id:randomUUID(),text:'进入之前的历史',confirmed:true});
+    await reader.command('network.connect',{confirmed:true});await until(()=>reader.snapshot().lobby.length===1);
+    assert.deepEqual((await reader.command('notifications.poll',{}) as {items:unknown[]}).items,[]);
+    await reader.command('notifications.set',{enabled:true});
+    await writer.command('lobby.send',{id:randomUUID(),text:'进入之后的实时消息',room:'builders',confirmed:true});
+    await until(()=>reader.snapshot().lobby.length===2);
+    let notices=await reader.command('notifications.poll',{}) as {enabled:boolean;items:{room:string}[]};assert(notices.enabled);assert.equal(notices.items.length,1);assert.equal(notices.items[0].room,'builders');
+    assert.equal((await writer.command('notifications.poll',{}) as {items:unknown[]}).items.length,0);
+    await reader.command('friend.block',{peer:writer.snapshot().publicKey,blocked:true});
+    await writer.command('lobby.send',{id:randomUUID(),text:'屏蔽后的消息',confirmed:true});
+    await new Promise(r=>setTimeout(r,100));assert.equal((await reader.command('notifications.poll',{}) as {items:unknown[]}).items.length,1);
+    await reader.close();reader=new FriendsService(store,[]);assert.equal(reader.snapshot().notificationsEnabled,true);
+  }finally{await reader.close();await writer.close();await relay.close();}
+});
+
+test('notification waiting never blocks commands, and cleans up on preference change, abort and shutdown',async()=>{
+  const service=new FriendsService(memoryStore(),[]);
+  try{
+    let batch=await service.command('notifications.poll',{}) as {revision:number};
+    const pending=service.command('notifications.wait',{after:batch.revision});
+    await service.command('notifications.set',{enabled:true});
+    batch=await pending as {revision:number};assert(batch.revision>0);
+    const controller=new AbortController(),cancelled=service.command('notifications.wait',{after:batch.revision},controller.signal);controller.abort();await cancelled;
+    const stopping=service.command('notifications.wait',{after:batch.revision});await service.close();assert.equal((await stopping as {enabled:boolean}).enabled,false);
+  }finally{await service.close();}
+});
+
+test('automatic local identity restores across restart without sending secrets to the client',async()=>{
+  const store=memoryStore(),secrets=new Map<string,string>(),protectedStore={read:async(id:string)=>secrets.get(id),write:async(id:string,value:string)=>{secrets.set(id,value);},remove:async(id:string)=>{secrets.delete(id);}};
+  let service=new FriendsService(store,[],protectedStore);
+  try{
+    await service.command('identity.local',{});const first=service.snapshot();assert(first.localIdentity);assert.equal(first.identity,'ready');assert.equal(secrets.size,1);
+    const secret=[...secrets.values()][0];assert(!JSON.stringify(first).includes(secret));assert(!JSON.stringify(store.read()).includes(secret));
+    const publicKey=first.publicKey;await service.close();service=new FriendsService(store,[],protectedStore);await service.start();assert.equal(service.snapshot().identity,'ready');assert.equal(service.snapshot().publicKey,publicKey);
+    await assert.rejects(service.command('identity.backup',{}),/跨设备/);
+  }finally{await service.close();}
+});
+test('automatic identity never replaces a locked legacy identity or recreates missing protected credentials',async()=>{
+  const store=memoryStore();let service=new FriendsService(store,[]);await service.command('identity.create',{password,profile:profile('原有身份')});const key=service.snapshot().publicKey;await service.close();let writes=0;
+  const protectedStore={read:async()=>undefined,write:async()=>{writes++;},remove:async()=>{}};
+  service=new FriendsService(store,[],protectedStore);
+  try{await assert.rejects(service.command('identity.local',{}),/旧版/);assert.equal(service.snapshot().publicKey,key);assert.equal(writes,0);}finally{await service.close();}
+});
+test('failed automatic identity persistence removes the temporary protected entry and leaves no unlocked identity',async()=>{
+  let removed=0;const service=new FriendsService({read:()=>initialStored(),write:async()=>{throw Error('disk unavailable');}},[],{read:async()=>undefined,write:async()=>{},remove:async()=>{removed++;}});
+  try{await assert.rejects(service.command('identity.local',{}),/安全保存/);assert.equal(service.snapshot().identity,'missing');assert.equal(removed,1);}finally{await service.close();}
+});
