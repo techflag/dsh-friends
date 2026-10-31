@@ -10,6 +10,14 @@
 
 在 DSH 原生插件管理中添加下载的 `.tgz`，启用后打开侧栏「搭子」。进入大厅先聊，聊得来再发起私聊。默认房间为大厅、插件交流和随便聊聊。
 
+## 也欢迎试试 WorkDSH
+
+搭子是我们围绕 DSH 做的社区插件。我们还在维护 **[WorkDSH](https://github.com/techflag/workdsh)**，一个把 AI 对话、项目、资料、技能和工作台放在同一个空间里的开源桌面。
+
+如果你希望日常处理资料、执行 AI 任务，再把自己的业务工具放进桌面，可以一起看看 WorkDSH，也欢迎给项目一个 Star ⭐。
+
+**[了解 WorkDSH →](https://github.com/techflag/workdsh)** · [下载 WorkDSH 桌面端](https://github.com/techflag/workdsh/releases)
+
 <details>
 <summary>开发与兼容信息</summary>
 
