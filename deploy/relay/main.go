@@ -46,14 +46,16 @@ type routingRecord struct {
 	expires time.Time
 }
 type relayApp struct {
-	relay   *khatru.Relay
-	stats   *stats
-	mu      sync.Mutex
-	routing map[string]routingRecord
-	recent  map[string][]routingRecord
-	rateAt  time.Time
-	tokens  float64
-	boot    time.Time
+	relay     *khatru.Relay
+	stats     *stats
+	mu        sync.Mutex
+	routing   map[string]routingRecord
+	recent    map[string][]routingRecord
+	rateAt    time.Time
+	tokens    float64
+	boot      time.Time
+	presence  *presenceHub
+	reception *receptionAssistant
 }
 
 func (a *relayApp) rememberPublic(e nostr.Event) {
@@ -108,7 +110,7 @@ func newApp(directory string) (*relayApp, error) {
 	rl.MaxMessageSize = 65536
 	rl.OnEvent = func(ctx context.Context, e nostr.Event) (bool, string) {
 		switch e.Kind {
-		case 9, 1059, 10050, 30388:
+		case 9, 1059, 10050, 30388, presenceKind:
 		default:
 			return true, "blocked: only DSH Friends events are accepted"
 		}
@@ -186,6 +188,10 @@ func newApp(directory string) (*relayApp, error) {
 	}
 	rl.StoreEvent = accept
 	rl.ReplaceEvent = accept
+	a.presence = newPresenceHub(a)
+	a.reception = newReceptionAssistant(a)
+	rl.OnEphemeralEvent = a.presence.observe
+	rl.OnEventSaved = a.reception.observe
 	rl.QueryStored = func(ctx context.Context, filter nostr.Filter) iter.Seq[nostr.Event] {
 		return func(yield func(nostr.Event) bool) {
 			records := []nostr.Event{}
@@ -281,12 +287,14 @@ func (a *relayApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-store")
 		json.NewEncoder(w).Encode(struct {
 			publicSummary
-			Status               string `json:"status"`
-			OnlineConnections    int    `json:"onlineConnections"`
-			UptimeSeconds        int64  `json:"uptimeSeconds"`
-			ChatHistoryPersisted bool   `json:"chatHistoryPersisted"`
-			PublicHistoryCache   any    `json:"publicHistoryCache"`
-		}{a.stats.summary(), "operational", clients, int64(time.Since(a.boot).Seconds()), false, map[string]any{"storage": "memory", "maxPerRoom": 100, "maxAgeSeconds": 86400, "clearedOnRestart": true}})
+			Status               string         `json:"status"`
+			OnlineConnections    int            `json:"onlineConnections"`
+			UptimeSeconds        int64          `json:"uptimeSeconds"`
+			ChatHistoryPersisted bool           `json:"chatHistoryPersisted"`
+			PublicHistoryCache   any            `json:"publicHistoryCache"`
+			OnlineByRoom         map[string]int `json:"onlineByRoom"`
+			Reception            receptionStats `json:"reception"`
+		}{a.stats.summary(), "operational", clients, int64(time.Since(a.boot).Seconds()), false, map[string]any{"storage": "memory", "maxPerRoom": 100, "maxAgeSeconds": 86400, "clearedOnRestart": true}, a.presence.counts(), a.reception.summary()})
 	case "/healthz":
 		w.Header().Set("Content-Type", "text/plain")
 		io.WriteString(w, "ok\n")
@@ -344,6 +352,7 @@ func main() {
 				a.recent[room] = valid
 			}
 			a.mu.Unlock()
+			a.presence.expire()
 		}
 	}()
 	log.Print("DSH Friends real-time relay started; operational statistics only, public history in bounded memory only; no chat disk storage.")

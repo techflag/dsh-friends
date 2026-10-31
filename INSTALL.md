@@ -1,17 +1,23 @@
 # DSH 搭子 · 通用插件安装说明
 
-版本：0.1.0-alpha.10。macOS 和 Windows 使用同一个 `dsh-friends-0.1.0-alpha.10.tgz`，不需要根据操作系统选择插件包。适用于支持第三方插件的 DSH 桌面端；WorkDSH 不是依赖。
+版本：0.1.0-alpha.11。macOS 和 Windows 使用同一个 `dsh-friends-0.1.0-alpha.11.tgz`，不需要根据操作系统选择插件包。适用于支持第三方插件的 DSH 桌面端；WorkDSH 不是依赖。
 
-## 安装
+## 推荐：通过 npm 包名安装
+
+在 DSH 桌面端打开「插件 → 添加插件」，输入 `dsh-friends`，选择 **npm 官方源**并安装。需要固定当前版本时输入 `dsh-friends@0.1.0-alpha.11`。启用后从侧栏打开「搭子」；宿主要求重启时完整退出再打开。
+
+国内镜像源可能延迟同步。若提示找不到包或版本，先切换 npm 官方源，不必重新下载桌面端。
+
+## 备选：本地插件包安装
 
 1. 下载 `.tgz`，不要解压。
 2. 打开 DSH 桌面端“插件 → 添加插件”，填写下载文件的完整路径。
 3. 安装完成后启用 `dsh-friends`。提示重启或后台版本不一致时，完整退出桌面应用再打开。
 4. 从侧栏打开“搭子”，同意连接社区。可直接浏览公共历史，在“我”中修改昵称；首次发送自动准备本机身份。
 
-Windows 路径示例：`C:\Users\你的用户名\Downloads\dsh-friends-0.1.0-alpha.10.tgz`。右键“复制文件地址”后去掉两端引号。
+Windows 路径示例：`C:\Users\你的用户名\Downloads\dsh-friends-0.1.0-alpha.11.tgz`。右键“复制文件地址”后去掉两端引号。
 
-Mac 路径示例：`/Users/你的用户名/Downloads/dsh-friends-0.1.0-alpha.10.tgz`。Finder 中选中文件，按 Option + Command + C 复制完整路径。
+Mac 路径示例：`/Users/你的用户名/Downloads/dsh-friends-0.1.0-alpha.11.tgz`。Finder 中选中文件，按 Option + Command + C 复制完整路径。
 
 插件声明适配 DSH 底座 `0.2.0-rc.2`、`0.2.1-rc.2`、`0.2.1-rc.5`；底座版本与桌面外壳版本号可能不同。其他版本尚未验证。旧安装器若重复安装同版本包提示无法确定依赖变更，先检查插件详情是否已经安装，再启用组件，不要反复覆盖安装。
 

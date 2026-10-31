@@ -13,7 +13,7 @@
 
 - Product direction (2026-10-31): public conversation first. Default Lobby / Messages / Contacts / Me; friendship is optional after interaction. No-identity reading and first-post identity setup are now implemented in the native plugin, with public-network acceptance records. Keep existing encrypted private messaging as a later step.
 
-- Current package: 0.1.0-alpha.10. Public kind 9 lobby and NIP-42 private-subscription authentication are implemented. Preserve separate public/private subscriptions and Host-only challenge signing.
+- Current package: 0.1.0-alpha.11. Public kind 9 lobby, room presence/reception events and NIP-42 private-subscription authentication are implemented. Preserve separate public/private subscriptions and Host-only challenge signing.
 - Chat UI uses left/right bubbles with top navigation and top default-room tabs. The user approved an independent plum palette for the plugin; preserve the surrounding host UI. Do not regress to a wide log list or move reply controls away from their messages.
 - Public acceptance scripts are opt-in and must never run as part of default tests/CI. Document exact host/platform/network scope; the two-physical-network and dataelement Desktop gates remain open.
 

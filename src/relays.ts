@@ -2,7 +2,7 @@ import { AbstractRelay as Relay, type Subscription } from 'nostr-tools/abstract-
 import {verifyEvent} from 'nostr-tools/pure';
 import type { Event, EventTemplate, VerifiedEvent } from 'nostr-tools/pure';
 import type { Filter } from 'nostr-tools/filter';
-import { PROFILE_KIND, PROFILE_TAG, LOBBY_KIND, LOBBY_TAG, ROOMS } from './model.js';
+import { PROFILE_KIND, PROFILE_TAG, LOBBY_KIND, PRESENCE_KIND, PRESENCE_SNAPSHOT_KIND, ROOMS } from './model.js';
 import WebSocket from 'ws';
 import {HttpsProxyAgent} from 'https-proxy-agent';
 import {SocksProxyAgent} from 'socks-proxy-agent';
@@ -67,6 +67,7 @@ export class RelayTransport {
   private subscribePublic(url:string,relay:Relay,publicKey?:string){
     const key=url+':public',generation=this.generation;this.closeSubscription(key);
     const filters:Filter[]=ROOMS.map(room=>({kinds:[LOBBY_KIND],'#t':[room.tag],limit:50}));
+    filters.push(...ROOMS.map(room=>({kinds:[PRESENCE_KIND,PRESENCE_SNAPSHOT_KIND],'#t':[room.tag],since:Math.floor(Date.now()/1000)-120,limit:50})));
     if(publicKey)filters.push({kinds:[PROFILE_KIND],'#d':[PROFILE_TAG],limit:200});
     let caughtUp=false;
     const sub=relay.subscribe(filters,{onevent:event=>this.receive(event,caughtUp),oneose:()=>{caughtUp=true;},onclose:reason=>{

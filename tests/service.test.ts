@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { decrypt as decryptBackup } from 'nostr-tools/nip49';
 import { bech32 } from '@scure/base';
-import { initialStored, type Stored, type Store } from '../src/model.js';
+import { initialStored, PROFILE_KIND, type Stored, type Store } from '../src/model.js';
 import { FriendsService } from '../src/service.js';
 import { localRelay } from './relay-fixture.js';
 
@@ -54,7 +54,7 @@ test('two real relay clients discover, approve, encrypt, retry and recover witho
     await b.command('identity.create',{password,profile:profile('测试乙')});
     const keyA=a.snapshot().publicKey!,keyB=b.snapshot().publicKey!;
     await a.command('network.connect',{confirmed:true});await b.command('network.connect',{confirmed:true});
-    assert.equal(relay.events.size,0,'connect alone must not publish a profile');
+    assert.equal([...relay.events.values()].filter(event=>event.kind===PROFILE_KIND).length,0,'connect alone must not publish a profile');
     await a.command('discovery.visibility',{visible:true,confirmed:true});await b.command('discovery.visibility',{visible:true,confirmed:true});
     await until(()=>a.snapshot().peers.length===1&&b.snapshot().peers.length===1);
     const requestId=randomUUID();await a.command('friend.request',{peer:keyB,id:requestId,text:'一起交流？'});

@@ -129,7 +129,7 @@ function localIdentityStore() {
 // src/index.ts
 import { defineDomain } from "@deepseek-ai/dsh-storage-domain";
 
-// node_modules/zod/v4/classic/external.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/external.js
 var external_exports = {};
 __export(external_exports, {
   $brand: () => $brand,
@@ -372,7 +372,7 @@ __export(external_exports, {
   xor: () => xor
 });
 
-// node_modules/zod/v4/core/index.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/index.js
 var core_exports2 = {};
 __export(core_exports2, {
   $ZodAny: () => $ZodAny,
@@ -651,7 +651,7 @@ __export(core_exports2, {
   version: () => version
 });
 
-// node_modules/zod/v4/core/core.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/core.js
 var _a;
 var NEVER = /* @__PURE__ */ Object.freeze({
   status: "aborted"
@@ -728,7 +728,7 @@ function config(newConfig) {
   return globalConfig;
 }
 
-// node_modules/zod/v4/core/util.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/util.js
 var util_exports = {};
 __export(util_exports, {
   BIGINT_FORMAT_RANGES: () => BIGINT_FORMAT_RANGES,
@@ -1424,7 +1424,7 @@ var Class = class {
   }
 };
 
-// node_modules/zod/v4/core/errors.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/errors.js
 var initializer = (inst, def) => {
   inst.name = "$ZodError";
   Object.defineProperty(inst, "_zod", {
@@ -1563,7 +1563,7 @@ function prettifyError(error51) {
   return lines.join("\n");
 }
 
-// node_modules/zod/v4/core/parse.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/parse.js
 var _parse = (_Err) => (schema, value, _ctx, _params) => {
   const ctx = _ctx ? { ..._ctx, async: false } : { async: false };
   const result = schema._zod.run({ value, issues: [] }, ctx);
@@ -1651,7 +1651,7 @@ var _safeDecodeAsync = (_Err) => async (schema, value, _ctx) => {
 };
 var safeDecodeAsync = /* @__PURE__ */ _safeDecodeAsync($ZodRealError);
 
-// node_modules/zod/v4/core/regexes.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/regexes.js
 var regexes_exports = {};
 __export(regexes_exports, {
   base64: () => base64,
@@ -1810,7 +1810,7 @@ var sha512_hex = /^[0-9a-fA-F]{128}$/;
 var sha512_base64 = /* @__PURE__ */ fixedBase64(86, "==");
 var sha512_base64url = /* @__PURE__ */ fixedBase64url(86);
 
-// node_modules/zod/v4/core/checks.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/checks.js
 var $ZodCheck = /* @__PURE__ */ $constructor("$ZodCheck", (inst, def) => {
   var _a3;
   inst._zod ?? (inst._zod = {});
@@ -2358,7 +2358,7 @@ var $ZodCheckOverwrite = /* @__PURE__ */ $constructor("$ZodCheckOverwrite", (ins
   };
 });
 
-// node_modules/zod/v4/core/doc.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/doc.js
 var Doc = class {
   constructor(args = []) {
     this.content = [];
@@ -2394,14 +2394,14 @@ var Doc = class {
   }
 };
 
-// node_modules/zod/v4/core/versions.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/versions.js
 var version = {
   major: 4,
   minor: 4,
   patch: 3
 };
 
-// node_modules/zod/v4/core/schemas.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/schemas.js
 var $ZodType = /* @__PURE__ */ $constructor("$ZodType", (inst, def) => {
   var _a3;
   inst ?? (inst = {});
@@ -4494,7 +4494,7 @@ function handleRefineResult(result, payload, input, inst) {
   }
 }
 
-// node_modules/zod/v4/locales/index.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/index.js
 var locales_exports = {};
 __export(locales_exports, {
   ar: () => ar_default,
@@ -4551,7 +4551,7 @@ __export(locales_exports, {
   zhTW: () => zh_TW_default
 });
 
-// node_modules/zod/v4/locales/ar.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ar.js
 var error = () => {
   const Sizable = {
     string: { unit: "\u062D\u0631\u0641", verb: "\u0623\u0646 \u064A\u062D\u0648\u064A" },
@@ -4658,7 +4658,7 @@ function ar_default() {
   };
 }
 
-// node_modules/zod/v4/locales/az.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/az.js
 var error2 = () => {
   const Sizable = {
     string: { unit: "simvol", verb: "olmal\u0131d\u0131r" },
@@ -4764,7 +4764,7 @@ function az_default() {
   };
 }
 
-// node_modules/zod/v4/locales/be.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/be.js
 function getBelarusianPlural(count, one, few, many) {
   const absCount = Math.abs(count);
   const lastDigit = absCount % 10;
@@ -4921,7 +4921,7 @@ function be_default() {
   };
 }
 
-// node_modules/zod/v4/locales/bg.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/bg.js
 var error4 = () => {
   const Sizable = {
     string: { unit: "\u0441\u0438\u043C\u0432\u043E\u043B\u0430", verb: "\u0434\u0430 \u0441\u044A\u0434\u044A\u0440\u0436\u0430" },
@@ -5042,7 +5042,7 @@ function bg_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ca.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ca.js
 var error5 = () => {
   const Sizable = {
     string: { unit: "car\xE0cters", verb: "contenir" },
@@ -5151,7 +5151,7 @@ function ca_default() {
   };
 }
 
-// node_modules/zod/v4/locales/cs.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/cs.js
 var error6 = () => {
   const Sizable = {
     string: { unit: "znak\u016F", verb: "m\xEDt" },
@@ -5263,7 +5263,7 @@ function cs_default() {
   };
 }
 
-// node_modules/zod/v4/locales/da.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/da.js
 var error7 = () => {
   const Sizable = {
     string: { unit: "tegn", verb: "havde" },
@@ -5379,7 +5379,7 @@ function da_default() {
   };
 }
 
-// node_modules/zod/v4/locales/de.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/de.js
 var error8 = () => {
   const Sizable = {
     string: { unit: "Zeichen", verb: "zu haben" },
@@ -5488,7 +5488,7 @@ function de_default() {
   };
 }
 
-// node_modules/zod/v4/locales/el.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/el.js
 var error9 = () => {
   const Sizable = {
     string: { unit: "\u03C7\u03B1\u03C1\u03B1\u03BA\u03C4\u03AE\u03C1\u03B5\u03C2", verb: "\u03BD\u03B1 \u03AD\u03C7\u03B5\u03B9" },
@@ -5598,7 +5598,7 @@ function el_default() {
   };
 }
 
-// node_modules/zod/v4/locales/en.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/en.js
 var error10 = () => {
   const Sizable = {
     string: { unit: "characters", verb: "to have" },
@@ -5711,7 +5711,7 @@ function en_default() {
   };
 }
 
-// node_modules/zod/v4/locales/eo.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/eo.js
 var error11 = () => {
   const Sizable = {
     string: { unit: "karaktrojn", verb: "havi" },
@@ -5821,7 +5821,7 @@ function eo_default() {
   };
 }
 
-// node_modules/zod/v4/locales/es.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/es.js
 var error12 = () => {
   const Sizable = {
     string: { unit: "caracteres", verb: "tener" },
@@ -5954,7 +5954,7 @@ function es_default() {
   };
 }
 
-// node_modules/zod/v4/locales/fa.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/fa.js
 var error13 = () => {
   const Sizable = {
     string: { unit: "\u06A9\u0627\u0631\u0627\u06A9\u062A\u0631", verb: "\u062F\u0627\u0634\u062A\u0647 \u0628\u0627\u0634\u062F" },
@@ -6069,7 +6069,7 @@ function fa_default() {
   };
 }
 
-// node_modules/zod/v4/locales/fi.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/fi.js
 var error14 = () => {
   const Sizable = {
     string: { unit: "merkki\xE4", subject: "merkkijonon" },
@@ -6182,7 +6182,7 @@ function fi_default() {
   };
 }
 
-// node_modules/zod/v4/locales/fr.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/fr.js
 var error15 = () => {
   const Sizable = {
     string: { unit: "caract\xE8res", verb: "avoir" },
@@ -6308,7 +6308,7 @@ function fr_default() {
   };
 }
 
-// node_modules/zod/v4/locales/fr-CA.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/fr-CA.js
 var error16 = () => {
   const Sizable = {
     string: { unit: "caract\xE8res", verb: "avoir" },
@@ -6416,7 +6416,7 @@ function fr_CA_default() {
   };
 }
 
-// node_modules/zod/v4/locales/he.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/he.js
 var error17 = () => {
   const TypeNames = {
     string: { label: "\u05DE\u05D7\u05E8\u05D5\u05D6\u05EA", gender: "f" },
@@ -6611,7 +6611,7 @@ function he_default() {
   };
 }
 
-// node_modules/zod/v4/locales/hr.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/hr.js
 var error18 = () => {
   const Sizable = {
     string: { unit: "znakova", verb: "imati" },
@@ -6734,7 +6734,7 @@ function hr_default() {
   };
 }
 
-// node_modules/zod/v4/locales/hu.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/hu.js
 var error19 = () => {
   const Sizable = {
     string: { unit: "karakter", verb: "legyen" },
@@ -6843,7 +6843,7 @@ function hu_default() {
   };
 }
 
-// node_modules/zod/v4/locales/hy.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/hy.js
 function getArmenianPlural(count, one, many) {
   return Math.abs(count) === 1 ? one : many;
 }
@@ -6991,7 +6991,7 @@ function hy_default() {
   };
 }
 
-// node_modules/zod/v4/locales/id.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/id.js
 var error21 = () => {
   const Sizable = {
     string: { unit: "karakter", verb: "memiliki" },
@@ -7098,7 +7098,7 @@ function id_default() {
   };
 }
 
-// node_modules/zod/v4/locales/is.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/is.js
 var error22 = () => {
   const Sizable = {
     string: { unit: "stafi", verb: "a\xF0 hafa" },
@@ -7208,7 +7208,7 @@ function is_default() {
   };
 }
 
-// node_modules/zod/v4/locales/it.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/it.js
 var error23 = () => {
   const Sizable = {
     string: { unit: "caratteri", verb: "avere" },
@@ -7317,7 +7317,7 @@ function it_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ja.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ja.js
 var error24 = () => {
   const Sizable = {
     string: { unit: "\u6587\u5B57", verb: "\u3067\u3042\u308B" },
@@ -7425,7 +7425,7 @@ function ja_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ka.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ka.js
 var error25 = () => {
   const Sizable = {
     string: { unit: "\u10E1\u10D8\u10DB\u10D1\u10DD\u10DA\u10DD", verb: "\u10E3\u10DC\u10D3\u10D0 \u10E8\u10D4\u10D8\u10EA\u10D0\u10D5\u10D3\u10D4\u10E1" },
@@ -7538,7 +7538,7 @@ function ka_default() {
   };
 }
 
-// node_modules/zod/v4/locales/km.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/km.js
 var error26 = () => {
   const Sizable = {
     string: { unit: "\u178F\u17BD\u17A2\u1780\u17D2\u179F\u179A", verb: "\u1782\u17BD\u179A\u1798\u17B6\u1793" },
@@ -7649,12 +7649,12 @@ function km_default() {
   };
 }
 
-// node_modules/zod/v4/locales/kh.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/kh.js
 function kh_default() {
   return km_default();
 }
 
-// node_modules/zod/v4/locales/ko.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ko.js
 var error27 = () => {
   const Sizable = {
     string: { unit: "\uBB38\uC790", verb: "to have" },
@@ -7766,7 +7766,7 @@ function ko_default() {
   };
 }
 
-// node_modules/zod/v4/locales/lt.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/lt.js
 var capitalizeFirstCharacter = (text) => {
   return text.charAt(0).toUpperCase() + text.slice(1);
 };
@@ -7970,7 +7970,7 @@ function lt_default() {
   };
 }
 
-// node_modules/zod/v4/locales/mk.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/mk.js
 var error29 = () => {
   const Sizable = {
     string: { unit: "\u0437\u043D\u0430\u0446\u0438", verb: "\u0434\u0430 \u0438\u043C\u0430\u0430\u0442" },
@@ -8080,7 +8080,7 @@ function mk_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ms.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ms.js
 var error30 = () => {
   const Sizable = {
     string: { unit: "aksara", verb: "mempunyai" },
@@ -8188,7 +8188,7 @@ function ms_default() {
   };
 }
 
-// node_modules/zod/v4/locales/nl.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/nl.js
 var error31 = () => {
   const Sizable = {
     string: { unit: "tekens", verb: "heeft" },
@@ -8299,7 +8299,7 @@ function nl_default() {
   };
 }
 
-// node_modules/zod/v4/locales/no.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/no.js
 var error32 = () => {
   const Sizable = {
     string: { unit: "tegn", verb: "\xE5 ha" },
@@ -8408,7 +8408,7 @@ function no_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ota.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ota.js
 var error33 = () => {
   const Sizable = {
     string: { unit: "harf", verb: "olmal\u0131d\u0131r" },
@@ -8518,7 +8518,7 @@ function ota_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ps.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ps.js
 var error34 = () => {
   const Sizable = {
     string: { unit: "\u062A\u0648\u06A9\u064A", verb: "\u0648\u0644\u0631\u064A" },
@@ -8633,7 +8633,7 @@ function ps_default() {
   };
 }
 
-// node_modules/zod/v4/locales/pl.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/pl.js
 var error35 = () => {
   const Sizable = {
     string: { unit: "znak\xF3w", verb: "mie\u0107" },
@@ -8743,7 +8743,7 @@ function pl_default() {
   };
 }
 
-// node_modules/zod/v4/locales/pt.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/pt.js
 var error36 = () => {
   const Sizable = {
     string: { unit: "caracteres", verb: "ter" },
@@ -8852,7 +8852,7 @@ function pt_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ro.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ro.js
 var error37 = () => {
   const Sizable = {
     string: { unit: "caractere", verb: "s\u0103 aib\u0103" },
@@ -8972,7 +8972,7 @@ function ro_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ru.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ru.js
 function getRussianPlural(count, one, few, many) {
   const absCount = Math.abs(count);
   const lastDigit = absCount % 10;
@@ -9129,7 +9129,7 @@ function ru_default() {
   };
 }
 
-// node_modules/zod/v4/locales/sl.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/sl.js
 var error39 = () => {
   const Sizable = {
     string: { unit: "znakov", verb: "imeti" },
@@ -9239,7 +9239,7 @@ function sl_default() {
   };
 }
 
-// node_modules/zod/v4/locales/sv.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/sv.js
 var error40 = () => {
   const Sizable = {
     string: { unit: "tecken", verb: "att ha" },
@@ -9350,7 +9350,7 @@ function sv_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ta.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ta.js
 var error41 = () => {
   const Sizable = {
     string: { unit: "\u0B8E\u0BB4\u0BC1\u0BA4\u0BCD\u0BA4\u0BC1\u0B95\u0BCD\u0B95\u0BB3\u0BCD", verb: "\u0B95\u0BCA\u0BA3\u0BCD\u0B9F\u0BBF\u0BB0\u0BC1\u0B95\u0BCD\u0B95 \u0BB5\u0BC7\u0BA3\u0BCD\u0B9F\u0BC1\u0BAE\u0BCD" },
@@ -9461,7 +9461,7 @@ function ta_default() {
   };
 }
 
-// node_modules/zod/v4/locales/th.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/th.js
 var error42 = () => {
   const Sizable = {
     string: { unit: "\u0E15\u0E31\u0E27\u0E2D\u0E31\u0E01\u0E29\u0E23", verb: "\u0E04\u0E27\u0E23\u0E21\u0E35" },
@@ -9572,7 +9572,7 @@ function th_default() {
   };
 }
 
-// node_modules/zod/v4/locales/tr.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/tr.js
 var error43 = () => {
   const Sizable = {
     string: { unit: "karakter", verb: "olmal\u0131" },
@@ -9678,7 +9678,7 @@ function tr_default() {
   };
 }
 
-// node_modules/zod/v4/locales/uk.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/uk.js
 var error44 = () => {
   const Sizable = {
     string: { unit: "\u0441\u0438\u043C\u0432\u043E\u043B\u0456\u0432", verb: "\u043C\u0430\u0442\u0438\u043C\u0435" },
@@ -9787,12 +9787,12 @@ function uk_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ua.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ua.js
 function ua_default() {
   return uk_default();
 }
 
-// node_modules/zod/v4/locales/ur.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ur.js
 var error45 = () => {
   const Sizable = {
     string: { unit: "\u062D\u0631\u0648\u0641", verb: "\u06C1\u0648\u0646\u0627" },
@@ -9903,7 +9903,7 @@ function ur_default() {
   };
 }
 
-// node_modules/zod/v4/locales/uz.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/uz.js
 var error46 = () => {
   const Sizable = {
     string: { unit: "belgi", verb: "bo\u2018lishi kerak" },
@@ -10014,7 +10014,7 @@ function uz_default() {
   };
 }
 
-// node_modules/zod/v4/locales/vi.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/vi.js
 var error47 = () => {
   const Sizable = {
     string: { unit: "k\xFD t\u1EF1", verb: "c\xF3" },
@@ -10123,7 +10123,7 @@ function vi_default() {
   };
 }
 
-// node_modules/zod/v4/locales/zh-CN.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/zh-CN.js
 var error48 = () => {
   const Sizable = {
     string: { unit: "\u5B57\u7B26", verb: "\u5305\u542B" },
@@ -10233,7 +10233,7 @@ function zh_CN_default() {
   };
 }
 
-// node_modules/zod/v4/locales/zh-TW.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/zh-TW.js
 var error49 = () => {
   const Sizable = {
     string: { unit: "\u5B57\u5143", verb: "\u64C1\u6709" },
@@ -10341,7 +10341,7 @@ function zh_TW_default() {
   };
 }
 
-// node_modules/zod/v4/locales/yo.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/yo.js
 var error50 = () => {
   const Sizable = {
     string: { unit: "\xE0mi", verb: "n\xED" },
@@ -10449,7 +10449,7 @@ function yo_default() {
   };
 }
 
-// node_modules/zod/v4/core/registries.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/registries.js
 var _a2;
 var $output = Symbol("ZodOutput");
 var $input = Symbol("ZodInput");
@@ -10499,7 +10499,7 @@ function registry() {
 (_a2 = globalThis).__zod_globalRegistry ?? (_a2.__zod_globalRegistry = registry());
 var globalRegistry = globalThis.__zod_globalRegistry;
 
-// node_modules/zod/v4/core/api.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/api.js
 // @__NO_SIDE_EFFECTS__
 function _string(Class2, params) {
   return new Class2({
@@ -11538,7 +11538,7 @@ function _stringFormat(Class2, format, fnOrRegex, _params = {}) {
   return inst;
 }
 
-// node_modules/zod/v4/core/to-json-schema.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/to-json-schema.js
 function initializeContext(params) {
   let target = params?.target ?? "draft-2020-12";
   if (target === "draft-4")
@@ -11897,7 +11897,7 @@ var createStandardJSONSchemaMethod = (schema, io, processors = {}) => (params) =
   return finalize(ctx, schema);
 };
 
-// node_modules/zod/v4/core/json-schema-processors.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/json-schema-processors.js
 var formatMap = {
   guid: "uuid",
   url: "uri",
@@ -12441,7 +12441,7 @@ function toJSONSchema(input, params) {
   return finalize(ctx, input);
 }
 
-// node_modules/zod/v4/core/json-schema-generator.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/json-schema-generator.js
 var JSONSchemaGenerator = class {
   /** @deprecated Access via ctx instead */
   get metadataRegistry() {
@@ -12516,10 +12516,10 @@ var JSONSchemaGenerator = class {
   }
 };
 
-// node_modules/zod/v4/core/json-schema.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/json-schema.js
 var json_schema_exports = {};
 
-// node_modules/zod/v4/classic/schemas.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/schemas.js
 var schemas_exports2 = {};
 __export(schemas_exports2, {
   ZodAny: () => ZodAny,
@@ -12690,7 +12690,7 @@ __export(schemas_exports2, {
   xor: () => xor
 });
 
-// node_modules/zod/v4/classic/checks.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/checks.js
 var checks_exports2 = {};
 __export(checks_exports2, {
   endsWith: () => _endsWith,
@@ -12724,7 +12724,7 @@ __export(checks_exports2, {
   uppercase: () => _uppercase
 });
 
-// node_modules/zod/v4/classic/iso.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/iso.js
 var iso_exports = {};
 __export(iso_exports, {
   ZodISODate: () => ZodISODate,
@@ -12765,7 +12765,7 @@ function duration2(params) {
   return _isoDuration(ZodISODuration, params);
 }
 
-// node_modules/zod/v4/classic/errors.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/errors.js
 var initializer2 = (inst, issues) => {
   $ZodError.init(inst, issues);
   inst.name = "ZodError";
@@ -12805,7 +12805,7 @@ var ZodRealError = /* @__PURE__ */ $constructor("ZodError", initializer2, {
   Parent: Error
 });
 
-// node_modules/zod/v4/classic/parse.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/parse.js
 var parse2 = /* @__PURE__ */ _parse(ZodRealError);
 var parseAsync2 = /* @__PURE__ */ _parseAsync(ZodRealError);
 var safeParse2 = /* @__PURE__ */ _safeParse(ZodRealError);
@@ -12819,7 +12819,7 @@ var safeDecode2 = /* @__PURE__ */ _safeDecode(ZodRealError);
 var safeEncodeAsync2 = /* @__PURE__ */ _safeEncodeAsync(ZodRealError);
 var safeDecodeAsync2 = /* @__PURE__ */ _safeDecodeAsync(ZodRealError);
 
-// node_modules/zod/v4/classic/schemas.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/schemas.js
 var _installedGroups = /* @__PURE__ */ new WeakMap();
 function _installLazyMethods(inst, group, methods) {
   const proto = Object.getPrototypeOf(inst);
@@ -14109,7 +14109,7 @@ function preprocess(fn, schema) {
   });
 }
 
-// node_modules/zod/v4/classic/compat.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/compat.js
 var ZodIssueCode = {
   invalid_type: "invalid_type",
   too_big: "too_big",
@@ -14135,7 +14135,7 @@ var ZodFirstPartyTypeKind;
 /* @__PURE__ */ (function(ZodFirstPartyTypeKind2) {
 })(ZodFirstPartyTypeKind || (ZodFirstPartyTypeKind = {}));
 
-// node_modules/zod/v4/classic/from-json-schema.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/from-json-schema.js
 var z = {
   ...schemas_exports2,
   ...checks_exports2,
@@ -14615,7 +14615,7 @@ function fromJSONSchema(schema, params) {
   return convertSchema(normalized, ctx);
 }
 
-// node_modules/zod/v4/classic/coerce.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/coerce.js
 var coerce_exports = {};
 __export(coerce_exports, {
   bigint: () => bigint3,
@@ -14640,7 +14640,7 @@ function date4(params) {
   return _coercedDate(ZodDate, params);
 }
 
-// node_modules/zod/v4/classic/external.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/external.js
 config(en_default());
 
 // src/model.ts
@@ -14648,6 +14648,8 @@ var CANDIDATE_RELAYS = ["wss://relay.techflag.cn"];
 var PROFILE_TAG = "dsh-friends/profile/v1";
 var PROFILE_KIND = 30388;
 var LOBBY_KIND = 9;
+var PRESENCE_KIND = 20009;
+var PRESENCE_SNAPSHOT_KIND = 20010;
 var LOBBY_TAG = "dsh-friends-lobby-v1";
 var LOBBY_LIMIT = 1e3;
 var ROOMS = [
@@ -14675,11 +14677,12 @@ var storedSchema = external_exports.object({
   publicHistory: external_exports.array(publicEventSchema).max(900).default([]),
   localIdentityId: external_exports.string().uuid().optional(),
   notificationsEnabled: external_exports.boolean().default(false),
+  entryNotificationsEnabled: external_exports.boolean().default(false),
   selectedRoom: roomIdSchema.default("general"),
   inboxUrls: external_exports.array(external_exports.string().max(256)).max(3).default([]),
   announcementAt: external_exports.number().int().nonnegative().default(0)
 }).strict().refine((s) => Boolean(s.publicKey) === Boolean(s.vault), "Incomplete identity");
-var initialStored = () => ({ version: 1, profile: { name: "\u65B0\u642D\u5B50", bio: "", tags: [], looking: "" }, discoverable: false, networkApproved: false, announcementAt: 0, inboxUrls: [], publicHistory: [], selectedRoom: "general", notificationsEnabled: false });
+var initialStored = () => ({ version: 1, profile: { name: "\u65B0\u642D\u5B50", bio: "", tags: [], looking: "" }, discoverable: false, networkApproved: false, announcementAt: 0, inboxUrls: [], publicHistory: [], selectedRoom: "general", notificationsEnabled: false, entryNotificationsEnabled: false });
 var emptyPrivate = () => ({ version: 1, lobbyQueue: [], peers: {}, invitations: {}, friends: [], blocked: [], messages: [], outbox: [], seen: [], inboxes: {} });
 var peerSchema = profileSchema.extend({ publicKey: hexKey, updatedAt: external_exports.number().int(), expiresAt: external_exports.number().int(), visible: external_exports.boolean(), eventId: hexKey });
 var invitationSchema = external_exports.object({ id: external_exports.string().uuid(), peer: hexKey, greeting: external_exports.string().max(120), direction: external_exports.enum(["incoming", "outgoing"]), state: external_exports.enum(["pending", "accepted", "ignored"]), expiresAt: external_exports.number().int() }).strict();
@@ -14697,13 +14700,13 @@ function demand(condition, code, message) {
 }
 
 // src/version.ts
-var PLUGIN_VERSION = "0.1.0-alpha.10";
+var PLUGIN_VERSION = "0.1.0-alpha.11";
 var PLUGIN_REVISION = "memory-history-community-relay-1";
 
 // src/service.ts
 import { randomBytes as randomBytes3, randomUUID } from "node:crypto";
 
-// node_modules/@scure/base/index.js
+// node_modules/.pnpm/@scure+base@2.0.0/node_modules/@scure/base/index.js
 function isBytes(a) {
   return a instanceof Uint8Array || ArrayBuffer.isView(a) && a.constructor.name === "Uint8Array";
 }
@@ -15009,7 +15012,7 @@ function genBech32(encoding) {
 }
 var bech32 = /* @__PURE__ */ genBech32("bech32");
 
-// node_modules/@noble/hashes/utils.js
+// node_modules/.pnpm/@noble+hashes@2.0.1/node_modules/@noble/hashes/utils.js
 function isBytes2(a) {
   return a instanceof Uint8Array || ArrayBuffer.isView(a) && a.constructor.name === "Uint8Array";
 }
@@ -15174,7 +15177,7 @@ var oidNist = (suffix) => ({
   oid: Uint8Array.from([6, 9, 96, 134, 72, 1, 101, 3, 4, 2, suffix])
 });
 
-// node_modules/@noble/hashes/_md.js
+// node_modules/.pnpm/@noble+hashes@2.0.1/node_modules/@noble/hashes/_md.js
 function Chi(a, b, c) {
   return a & b ^ ~a & c;
 }
@@ -15287,7 +15290,7 @@ var SHA256_IV = /* @__PURE__ */ Uint32Array.from([
   1541459225
 ]);
 
-// node_modules/@noble/hashes/sha2.js
+// node_modules/.pnpm/@noble+hashes@2.0.1/node_modules/@noble/hashes/sha2.js
 var SHA256_K = /* @__PURE__ */ Uint32Array.from([
   1116352408,
   1899447441,
@@ -15437,7 +15440,7 @@ var sha256 = /* @__PURE__ */ createHasher(
   /* @__PURE__ */ oidNist(1)
 );
 
-// node_modules/@noble/curves/utils.js
+// node_modules/.pnpm/@noble+curves@2.0.1/node_modules/@noble/curves/utils.js
 var _0n = /* @__PURE__ */ BigInt(0);
 var _1n = /* @__PURE__ */ BigInt(1);
 function abool(value, title = "") {
@@ -15586,7 +15589,7 @@ function memoized(fn) {
   };
 }
 
-// node_modules/@noble/curves/abstract/modular.js
+// node_modules/.pnpm/@noble+curves@2.0.1/node_modules/@noble/curves/abstract/modular.js
 var _0n2 = /* @__PURE__ */ BigInt(0);
 var _1n2 = /* @__PURE__ */ BigInt(1);
 var _2n = /* @__PURE__ */ BigInt(2);
@@ -15972,7 +15975,7 @@ function mapHashToField(key, fieldOrder, isLE3 = false) {
   return isLE3 ? numberToBytesLE(reduced, fieldLen) : numberToBytesBE(reduced, fieldLen);
 }
 
-// node_modules/@noble/curves/abstract/curve.js
+// node_modules/.pnpm/@noble+curves@2.0.1/node_modules/@noble/curves/abstract/curve.js
 var _0n3 = /* @__PURE__ */ BigInt(0);
 var _1n3 = /* @__PURE__ */ BigInt(1);
 function negateCt(condition, item) {
@@ -16205,7 +16208,7 @@ function createKeygen(randomSecretKey, getPublicKey3) {
   };
 }
 
-// node_modules/@noble/hashes/hmac.js
+// node_modules/.pnpm/@noble+hashes@2.0.1/node_modules/@noble/hashes/hmac.js
 var _HMAC = class {
   oHash;
   iHash;
@@ -16276,7 +16279,7 @@ var _HMAC = class {
 var hmac = (hash2, key, message) => new _HMAC(hash2, key).update(message).digest();
 hmac.create = (hash2, key) => new _HMAC(hash2, key);
 
-// node_modules/@noble/curves/abstract/weierstrass.js
+// node_modules/.pnpm/@noble+curves@2.0.1/node_modules/@noble/curves/abstract/weierstrass.js
 var divNearest = (num2, den) => (num2 + (num2 >= 0 ? den : -den) / _2n2) / den;
 function _splitEndoScalar(k, basis, n) {
   const [[a1, b1], [a2, b2]] = basis;
@@ -17148,7 +17151,7 @@ function ecdsa(Point, hash2, ecdsaOpts = {}) {
   });
 }
 
-// node_modules/@noble/curves/secp256k1.js
+// node_modules/.pnpm/@noble+curves@2.0.1/node_modules/@noble/curves/secp256k1.js
 var secp256k1_CURVE = {
   p: BigInt("0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f"),
   n: BigInt("0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"),
@@ -17301,7 +17304,7 @@ var schnorr = /* @__PURE__ */ (() => {
   };
 })();
 
-// node_modules/nostr-tools/lib/esm/pure.js
+// node_modules/.pnpm/nostr-tools@2.25.4_typescript@5.9.3/node_modules/nostr-tools/lib/esm/pure.js
 var utf8Decoder = new TextDecoder("utf-8");
 var utf8Encoder = new TextEncoder();
 function isHex32(input) {
@@ -17391,7 +17394,7 @@ var getPublicKey = i.getPublicKey;
 var finalizeEvent = i.finalizeEvent;
 var verifyEvent = i.verifyEvent;
 
-// node_modules/@noble/hashes/pbkdf2.js
+// node_modules/.pnpm/@noble+hashes@2.0.1/node_modules/@noble/hashes/pbkdf2.js
 function pbkdf2Init(hash2, _password, _salt, _opts) {
   ahash(hash2);
   const opts = checkOpts({ dkLen: 32, asyncTick: 10 }, _opts);
@@ -17436,7 +17439,7 @@ function pbkdf2(hash2, password2, salt, opts) {
   return pbkdf2Output(PRF, PRFSalt, DK, prfW, u);
 }
 
-// node_modules/@noble/hashes/scrypt.js
+// node_modules/.pnpm/@noble+hashes@2.0.1/node_modules/@noble/hashes/scrypt.js
 function XorAndSalsa(prev, pi, input, ii, out, oi) {
   let y00 = prev[pi++] ^ input[ii++], y01 = prev[pi++] ^ input[ii++];
   let y02 = prev[pi++] ^ input[ii++], y03 = prev[pi++] ^ input[ii++];
@@ -17585,7 +17588,7 @@ function scrypt(password2, salt, opts) {
   return scryptOutput(password2, dkLen, B, V, tmp);
 }
 
-// node_modules/@noble/ciphers/utils.js
+// node_modules/.pnpm/@noble+ciphers@2.1.1/node_modules/@noble/ciphers/utils.js
 function isBytes3(a) {
   return a instanceof Uint8Array || ArrayBuffer.isView(a) && a.constructor.name === "Uint8Array";
 }
@@ -17715,7 +17718,7 @@ function copyBytes2(bytes) {
   return Uint8Array.from(bytes);
 }
 
-// node_modules/@noble/ciphers/_arx.js
+// node_modules/.pnpm/@noble+ciphers@2.1.1/node_modules/@noble/ciphers/_arx.js
 var encodeStr = (str) => Uint8Array.from(str.split(""), (c) => c.charCodeAt(0));
 var sigma16 = encodeStr("expand 16-byte k");
 var sigma32 = encodeStr("expand 32-byte k");
@@ -17824,7 +17827,7 @@ function createCipher(core, opts) {
   };
 }
 
-// node_modules/@noble/ciphers/_poly1305.js
+// node_modules/.pnpm/@noble+ciphers@2.1.1/node_modules/@noble/ciphers/_poly1305.js
 function u8to16(a, i3) {
   return a[i3++] & 255 | (a[i3++] & 255) << 8;
 }
@@ -18082,7 +18085,7 @@ function wrapConstructorWithKey(hashCons) {
 }
 var poly1305 = /* @__PURE__ */ (() => wrapConstructorWithKey((key) => new Poly1305(key)))();
 
-// node_modules/@noble/ciphers/chacha.js
+// node_modules/.pnpm/@noble+ciphers@2.1.1/node_modules/@noble/ciphers/chacha.js
 function chachaCore(s, k, n, out, cnt, rounds = 20) {
   let y00 = s[0], y01 = s[1], y02 = s[2], y03 = s[3], y04 = k[0], y05 = k[1], y06 = k[2], y07 = k[3], y08 = k[4], y09 = k[5], y10 = k[6], y11 = k[7], y12 = cnt, y13 = n[0], y14 = n[1], y15 = n[2];
   let x00 = y00, x01 = y01, x02 = y02, x03 = y03, x04 = y04, x05 = y05, x06 = y06, x07 = y07, x08 = y08, x09 = y09, x10 = y10, x11 = y11, x12 = y12, x13 = y13, x14 = y14, x15 = y15;
@@ -18312,7 +18315,7 @@ var _poly1305_aead = (xorStream) => (key, nonce, AAD) => {
 var chacha20poly1305 = /* @__PURE__ */ wrapCipher({ blockSize: 64, nonceLength: 12, tagLength: 16 }, _poly1305_aead(chacha20));
 var xchacha20poly1305 = /* @__PURE__ */ wrapCipher({ blockSize: 64, nonceLength: 24, tagLength: 16 }, _poly1305_aead(xchacha20));
 
-// node_modules/nostr-tools/lib/esm/nip49.js
+// node_modules/.pnpm/nostr-tools@2.25.4_typescript@5.9.3/node_modules/nostr-tools/lib/esm/nip49.js
 var Bech32MaxSize = 5e3;
 function encodeBech32(prefix, data) {
   let words = bech32.toWords(data);
@@ -18355,7 +18358,7 @@ function decrypt(ncryptsec, password2) {
   return sec;
 }
 
-// node_modules/@noble/hashes/hkdf.js
+// node_modules/.pnpm/@noble+hashes@2.0.1/node_modules/@noble/hashes/hkdf.js
 function extract(hash2, ikm, salt) {
   ahash(hash2);
   if (salt === void 0)
@@ -18391,7 +18394,7 @@ function expand(hash2, prk, info, length = 32) {
   return okm.slice(0, length);
 }
 
-// node_modules/nostr-tools/lib/esm/nip44.js
+// node_modules/.pnpm/nostr-tools@2.25.4_typescript@5.9.3/node_modules/nostr-tools/lib/esm/nip44.js
 var utf8Decoder2 = new TextDecoder("utf-8");
 var utf8Encoder2 = new TextEncoder();
 var minPlaintextSize = 1;
@@ -18509,7 +18512,7 @@ function decrypt2(payload, conversationKey) {
   return unpad(padded);
 }
 
-// node_modules/nostr-tools/lib/esm/nip59.js
+// node_modules/.pnpm/nostr-tools@2.25.4_typescript@5.9.3/node_modules/nostr-tools/lib/esm/nip59.js
 var utf8Decoder3 = new TextDecoder("utf-8");
 var utf8Encoder3 = new TextEncoder();
 function isHex322(input) {
@@ -18788,7 +18791,7 @@ function unwrapEvent(wrap, recipientPrivateKey) {
   return rumor;
 }
 
-// node_modules/nostr-tools/lib/esm/abstract-relay.js
+// node_modules/.pnpm/nostr-tools@2.25.4_typescript@5.9.3/node_modules/nostr-tools/lib/esm/abstract-relay.js
 var utf8Decoder4 = new TextDecoder("utf-8");
 var utf8Encoder4 = new TextEncoder();
 function normalizeURL(url2) {
@@ -19429,7 +19432,7 @@ import { SocksProxyAgent } from "socks-proxy-agent";
 import { execFile as execFile3 } from "node:child_process";
 import { win32 as win322 } from "node:path";
 
-// node_modules/proxy-from-env/index.js
+// node_modules/.pnpm/proxy-from-env@2.1.0/node_modules/proxy-from-env/index.js
 var DEFAULT_PORTS = {
   ftp: 21,
   gopher: 70,
@@ -19693,6 +19696,7 @@ var RelayTransport = class {
     const key = url2 + ":public", generation = this.generation;
     this.closeSubscription(key);
     const filters = ROOMS.map((room) => ({ kinds: [LOBBY_KIND], "#t": [room.tag], limit: 50 }));
+    filters.push(...ROOMS.map((room) => ({ kinds: [PRESENCE_KIND, PRESENCE_SNAPSHOT_KIND], "#t": [room.tag], since: Math.floor(Date.now() / 1e3) - 120, limit: 50 })));
     if (publicKey) filters.push({ kinds: [PROFILE_KIND], "#d": [PROFILE_TAG], limit: 200 });
     let caughtUp = false;
     const sub = relay.subscribe(filters, { onevent: (event) => this.receive(event, caughtUp), oneose: () => {
@@ -19815,6 +19819,8 @@ var eventSchema = external_exports.object({ id: hexKey, pubkey: hexKey, created_
 var announcement = external_exports.object({ protocol: external_exports.literal("dsh-friends/1"), profile: profileSchema, visible: external_exports.boolean(), expiresAt: external_exports.number().int() }).strict();
 var control = external_exports.object({ protocol: external_exports.literal("dsh-friends/1"), type: external_exports.enum(["request", "accept", "text"]), id: external_exports.string().uuid(), requestId: external_exports.string().uuid().optional(), expiresAt: external_exports.number().int(), text: external_exports.string().min(1).max(2e3) }).strict();
 var password = external_exports.string().min(12).max(128).refine((p) => p.trim().length >= 12, "Use a longer password");
+var presencePayload = external_exports.object({ protocol: external_exports.literal("dsh-friends/presence/1"), action: external_exports.enum(["join", "heartbeat", "leave"]), name: external_exports.string().trim().min(1).max(20) }).strict();
+var presenceSnapshot = external_exports.object({ protocol: external_exports.literal("dsh-friends/presence-snapshot/1"), rooms: external_exports.record(roomIdSchema, external_exports.number().int().nonnegative().max(1e5)) }).strict();
 var now2 = () => Math.floor(Date.now() / 1e3);
 var FriendsService = class {
   constructor(store, urls = CANDIDATE_RELAYS, protectedIdentity) {
@@ -19854,7 +19860,7 @@ var FriendsService = class {
   noticeRevision = 0;
   noticeWaiters = /* @__PURE__ */ new Set();
   noticeBatch() {
-    return { revision: this.noticeRevision, enabled: this.stored.notificationsEnabled && this.stored.networkApproved && !this.closing, items: structuredClone(this.notices) };
+    return { revision: this.noticeRevision, enabled: this.stored.notificationsEnabled && this.stored.networkApproved && !this.closing, entryEnabled: this.stored.entryNotificationsEnabled && this.stored.networkApproved && !this.closing, items: structuredClone(this.notices) };
   }
   wakeNotices() {
     this.noticeRevision++;
@@ -19865,6 +19871,10 @@ var FriendsService = class {
     this.wakeNotices();
   }
   guestBlocked = /* @__PURE__ */ new Set();
+  roomOnline = { general: 0, builders: 0, random: 0 };
+  roomEntries = [];
+  presenceRoom;
+  presenceAt = 0;
   enqueue(run2) {
     if (this.closing) return Promise.reject(new FriendsError("closed", "\u63D2\u4EF6\u6B63\u5728\u505C\u6B62\u3002"));
     const next = this.chain.then(() => {
@@ -19901,10 +19911,10 @@ var FriendsService = class {
     for (const operation of data?.lobbyQueue ?? []) publicEvents.set(operation.event.id, operation.event);
     const lobby = [...publicEvents.values()].filter((e) => !data?.blocked.includes(e.pubkey) && !this.guestBlocked.has(e.pubkey)).sort((a, b) => a.created_at - b.created_at || a.id.localeCompare(b.id)).map((e) => {
       const operation = data?.lobbyQueue.find((o) => o.event.id === e.id);
-      return { id: e.id, room: eventRoom(e), publicKey: e.pubkey, name: e.tags.find((t2) => t2[0] === "name")?.[1]?.slice(0, 20) || e.pubkey.slice(0, 12), text: e.content, createdAt: e.created_at, ...e.tags.find((t2) => t2[0] === "q")?.[1] ? { replyTo: e.tags.find((t2) => t2[0] === "q")[1] } : {}, ...operation ? { status: operation.status, acceptedRelays: operation.acceptedRelays } : {} };
+      return { id: e.id, room: eventRoom(e), publicKey: e.pubkey, name: e.tags.find((t2) => t2[0] === "name")?.[1]?.slice(0, 20) || e.pubkey.slice(0, 12), text: e.content, createdAt: e.created_at, assistant: Boolean(e.tags.find((t2) => t2[0] === "bot" && t2[1] === "reception")), ...e.tags.find((t2) => t2[0] === "q")?.[1] ? { replyTo: e.tags.find((t2) => t2[0] === "q")[1] } : {}, ...operation ? { status: operation.status, acceptedRelays: operation.acceptedRelays } : {} };
     });
     const peers = data ? Object.values(data.peers).filter((p) => p.visible && p.expiresAt > t && !data.blocked.includes(p.publicKey)).sort((a, b) => b.updatedAt - a.updatedAt) : [];
-    return structuredClone({ runtimeVersion: PLUGIN_VERSION, runtimeRevision: PLUGIN_REVISION, historyPolicy: this.transport.urls.length > 0 && this.transport.urls.every((url2) => new URL(url2).hostname === "relay.techflag.cn") ? "memory-24h" : "relay-defined", identity: !this.stored.vault ? "missing" : this.secret ? "ready" : "locked", publicKey: this.stored.publicKey, profile: this.stored.profile, discoverable: this.stored.discoverable, published: this.publishedAt > t - LEASE_SECONDS, networkApproved: this.stored.networkApproved, relays: [...this.transport.status].map(([url2, state]) => ({ url: url2, state, privateState: this.transport.privateStatus.get(url2), route: this.transport.routes.get(url2), ...this.transport.details.get(url2) ? { detail: this.transport.details.get(url2) } : {} })), peers, invitations: data ? Object.values(data.invitations).filter((i3) => i3.state === "pending" && i3.expiresAt > t && !data.blocked.includes(i3.peer)) : [], friends: data ? data.friends.map((key) => data.peers[key] ?? { publicKey: key, name: key.slice(0, 12), bio: "", tags: [], looking: "", updatedAt: 0, expiresAt: 0, visible: false, eventId: "" }) : [], blocked: [.../* @__PURE__ */ new Set([...data?.blocked ?? [], ...this.guestBlocked])], messages: data?.messages.filter((m) => !data.blocked.includes(m.peer)) ?? [], lobby, localIdentity: Boolean(this.stored.localIdentityId), notificationsEnabled: this.stored.notificationsEnabled, selectedRoom: this.stored.selectedRoom, roomHistory: this.roomHistory, pending: (data?.outbox.length ?? 0) + (data?.lobbyQueue.filter((o) => o.status !== "relay-accepted").length ?? 0), pendingIds: [...data?.outbox.map((o) => o.id) ?? [], ...data?.lobbyQueue.filter((o) => o.status !== "relay-accepted").map((o) => o.id) ?? []], ...this.lastError ? { error: this.lastError } : {} });
+    return structuredClone({ runtimeVersion: PLUGIN_VERSION, runtimeRevision: PLUGIN_REVISION, historyPolicy: this.transport.urls.length > 0 && this.transport.urls.every((url2) => new URL(url2).hostname === "relay.techflag.cn") ? "memory-24h" : "relay-defined", identity: !this.stored.vault ? "missing" : this.secret ? "ready" : "locked", publicKey: this.stored.publicKey, profile: this.stored.profile, discoverable: this.stored.discoverable, published: this.publishedAt > t - LEASE_SECONDS, networkApproved: this.stored.networkApproved, relays: [...this.transport.status].map(([url2, state]) => ({ url: url2, state, privateState: this.transport.privateStatus.get(url2), route: this.transport.routes.get(url2), ...this.transport.details.get(url2) ? { detail: this.transport.details.get(url2) } : {} })), peers, invitations: data ? Object.values(data.invitations).filter((i3) => i3.state === "pending" && i3.expiresAt > t && !data.blocked.includes(i3.peer)) : [], friends: data ? data.friends.map((key) => data.peers[key] ?? { publicKey: key, name: key.slice(0, 12), bio: "", tags: [], looking: "", updatedAt: 0, expiresAt: 0, visible: false, eventId: "" }) : [], blocked: [.../* @__PURE__ */ new Set([...data?.blocked ?? [], ...this.guestBlocked])], messages: data?.messages.filter((m) => !data.blocked.includes(m.peer)) ?? [], lobby, localIdentity: Boolean(this.stored.localIdentityId), notificationsEnabled: this.stored.notificationsEnabled, entryNotificationsEnabled: this.stored.entryNotificationsEnabled, selectedRoom: this.stored.selectedRoom, roomOnline: this.roomOnline, roomEntries: this.roomEntries.filter((entry) => entry.createdAt > t - 300).slice(-20), roomHistory: this.roomHistory, pending: (data?.outbox.length ?? 0) + (data?.lobbyQueue.filter((o) => o.status !== "relay-accepted").length ?? 0), pendingIds: [...data?.outbox.map((o) => o.id) ?? [], ...data?.lobbyQueue.filter((o) => o.status !== "relay-accepted").map((o) => o.id) ?? []], ...this.lastError ? { error: this.lastError } : {} });
   }
   async command(endpoint, payload, signal) {
     if (endpoint === "notifications.wait") {
@@ -20054,9 +20064,20 @@ var FriendsService = class {
         this.wakeNotices();
         return this.snapshot();
       }
+      if (endpoint === "notifications.entry.set") {
+        const p = external_exports.object({ enabled: external_exports.boolean() }).strict().parse(payload);
+        await this.save({ ...this.stored, entryNotificationsEnabled: p.enabled });
+        this.wakeNotices();
+        return this.snapshot();
+      }
       if (endpoint === "room.select") {
         const p = external_exports.object({ room: roomIdSchema }).strict().parse(payload);
+        const old = this.stored.selectedRoom;
         await this.save({ ...this.stored, selectedRoom: p.room });
+        if (this.secret && this.stored.networkApproved) {
+          if (old !== p.room) await this.publishPresence("leave", old);
+          await this.publishPresence("join", p.room);
+        }
         return this.snapshot();
       }
       if (endpoint === "lobby.history") {
@@ -20212,6 +20233,7 @@ var FriendsService = class {
         if ([...this.transport.status.values()].includes("connected") && this.lastError?.startsWith("\u6240\u6709\u793E\u533A\u4E2D\u7EE7")) this.lastError = void 0;
         if (this.secret && this.stored.discoverable && this.publishedAt < now2() - 300) await this.publishProfile();
         if (this.secret && this.stored.inboxUrls.length && (!wasConnected || this.inboxPublishedAt < now2() - 60)) await this.publishInbox();
+        if (this.secret && (!wasConnected || this.presenceRoom !== this.stored.selectedRoom || this.presenceAt < now2() - 45)) await this.publishPresence(wasConnected ? "heartbeat" : "join", this.stored.selectedRoom);
         await this.flushLobby();
         await this.flush();
       }).catch(() => {
@@ -20227,8 +20249,17 @@ var FriendsService = class {
     this.lastError = void 0;
     if (this.secret && this.stored.discoverable) await this.publishProfile();
     else if (this.secret && this.stored.inboxUrls.length) await this.publishInbox();
+    if (this.secret) await this.publishPresence("join", this.stored.selectedRoom);
     await this.flushLobby();
     await this.flush();
+  }
+  async publishPresence(action, room) {
+    if (!this.secret || !this.stored.networkApproved || ![...this.transport.status.values()].includes("connected")) return;
+    const event = finalizeEvent({ kind: PRESENCE_KIND, created_at: now2(), tags: [["t", ROOMS.find((r) => r.id === room).tag], ["expiration", String(now2() + 90)]], content: JSON.stringify({ protocol: "dsh-friends/presence/1", action, name: this.stored.profile.name }) }, this.key());
+    if ((await this.transport.publish(event)).length) {
+      this.presenceRoom = action === "leave" ? void 0 : room;
+      this.presenceAt = now2();
+    }
   }
   async publishInbox() {
     const urls = this.transport.urls.filter((url2) => this.transport.status.get(url2) === "connected");
@@ -20417,6 +20448,32 @@ var FriendsService = class {
       if (live && event.pubkey !== this.stored.publicKey && !this.data?.blocked.includes(event.pubkey) && !this.guestBlocked.has(event.pubkey)) this.addNotice({ id: event.id, room: eventRoom(event), createdAt: now2() });
       return;
     }
+    if (event.kind === PRESENCE_SNAPSHOT_KIND) {
+      let value2;
+      try {
+        value2 = presenceSnapshot.parse(JSON.parse(event.content));
+      } catch {
+        return;
+      }
+      this.roomOnline = { general: value2.rooms.general ?? 0, builders: value2.rooms.builders ?? 0, random: value2.rooms.random ?? 0 };
+      return;
+    }
+    if (event.kind === PRESENCE_KIND) {
+      const room = eventRoom(event);
+      if (!room || event.created_at > now2() + 60) return;
+      let value2;
+      try {
+        value2 = presencePayload.parse(JSON.parse(event.content));
+      } catch {
+        return;
+      }
+      if (live && value2.action === "join" && event.pubkey !== this.stored.publicKey) {
+        const entry = { id: event.id, room, publicKey: event.pubkey, name: value2.name, createdAt: event.created_at };
+        if (!this.roomEntries.some((row) => row.id === event.id)) this.roomEntries = [...this.roomEntries, entry].slice(-20);
+        if (this.stored.entryNotificationsEnabled) this.addNotice({ id: event.id, room, createdAt: now2(), kind: "entry", name: value2.name });
+      }
+      return;
+    }
     if (!this.secret || !this.data || event.pubkey === this.stored.publicKey) return;
     if (event.kind === PROFILE_KIND) {
       if (event.created_at > now2() + 300 || !event.tags.some((t) => t[0] === "d" && t[1] === PROFILE_TAG)) return;
@@ -20498,6 +20555,10 @@ var FriendsService = class {
     this.closing = true;
     this.wakeNotices();
     if (this.timer) clearInterval(this.timer);
+    try {
+      await this.publishPresence("leave", this.stored.selectedRoom);
+    } catch {
+    }
     this.transport.close();
     await this.chain;
     this.stop();

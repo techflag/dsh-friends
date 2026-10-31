@@ -37,7 +37,7 @@ __export(client_exports, {
 });
 module.exports = __toCommonJS(client_exports);
 
-// node_modules/zod/v4/classic/external.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/external.js
 var external_exports = {};
 __export(external_exports, {
   $brand: () => $brand,
@@ -280,7 +280,7 @@ __export(external_exports, {
   xor: () => xor
 });
 
-// node_modules/zod/v4/core/index.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/index.js
 var core_exports2 = {};
 __export(core_exports2, {
   $ZodAny: () => $ZodAny,
@@ -559,7 +559,7 @@ __export(core_exports2, {
   version: () => version
 });
 
-// node_modules/zod/v4/core/core.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/core.js
 var _a;
 var NEVER = /* @__PURE__ */ Object.freeze({
   status: "aborted"
@@ -636,7 +636,7 @@ function config(newConfig) {
   return globalConfig;
 }
 
-// node_modules/zod/v4/core/util.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/util.js
 var util_exports = {};
 __export(util_exports, {
   BIGINT_FORMAT_RANGES: () => BIGINT_FORMAT_RANGES,
@@ -1332,7 +1332,7 @@ var Class = class {
   }
 };
 
-// node_modules/zod/v4/core/errors.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/errors.js
 var initializer = (inst, def) => {
   inst.name = "$ZodError";
   Object.defineProperty(inst, "_zod", {
@@ -1471,7 +1471,7 @@ function prettifyError(error51) {
   return lines.join("\n");
 }
 
-// node_modules/zod/v4/core/parse.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/parse.js
 var _parse = (_Err) => (schema, value, _ctx, _params) => {
   const ctx = _ctx ? { ..._ctx, async: false } : { async: false };
   const result = schema._zod.run({ value, issues: [] }, ctx);
@@ -1559,7 +1559,7 @@ var _safeDecodeAsync = (_Err) => async (schema, value, _ctx) => {
 };
 var safeDecodeAsync = /* @__PURE__ */ _safeDecodeAsync($ZodRealError);
 
-// node_modules/zod/v4/core/regexes.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/regexes.js
 var regexes_exports = {};
 __export(regexes_exports, {
   base64: () => base64,
@@ -1718,7 +1718,7 @@ var sha512_hex = /^[0-9a-fA-F]{128}$/;
 var sha512_base64 = /* @__PURE__ */ fixedBase64(86, "==");
 var sha512_base64url = /* @__PURE__ */ fixedBase64url(86);
 
-// node_modules/zod/v4/core/checks.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/checks.js
 var $ZodCheck = /* @__PURE__ */ $constructor("$ZodCheck", (inst, def) => {
   var _a3;
   inst._zod ?? (inst._zod = {});
@@ -2266,7 +2266,7 @@ var $ZodCheckOverwrite = /* @__PURE__ */ $constructor("$ZodCheckOverwrite", (ins
   };
 });
 
-// node_modules/zod/v4/core/doc.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/doc.js
 var Doc = class {
   constructor(args = []) {
     this.content = [];
@@ -2302,14 +2302,14 @@ var Doc = class {
   }
 };
 
-// node_modules/zod/v4/core/versions.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/versions.js
 var version = {
   major: 4,
   minor: 4,
   patch: 3
 };
 
-// node_modules/zod/v4/core/schemas.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/schemas.js
 var $ZodType = /* @__PURE__ */ $constructor("$ZodType", (inst, def) => {
   var _a3;
   inst ?? (inst = {});
@@ -4402,7 +4402,7 @@ function handleRefineResult(result, payload, input, inst) {
   }
 }
 
-// node_modules/zod/v4/locales/index.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/index.js
 var locales_exports = {};
 __export(locales_exports, {
   ar: () => ar_default,
@@ -4459,7 +4459,7 @@ __export(locales_exports, {
   zhTW: () => zh_TW_default
 });
 
-// node_modules/zod/v4/locales/ar.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ar.js
 var error = () => {
   const Sizable = {
     string: { unit: "\u062D\u0631\u0641", verb: "\u0623\u0646 \u064A\u062D\u0648\u064A" },
@@ -4566,7 +4566,7 @@ function ar_default() {
   };
 }
 
-// node_modules/zod/v4/locales/az.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/az.js
 var error2 = () => {
   const Sizable = {
     string: { unit: "simvol", verb: "olmal\u0131d\u0131r" },
@@ -4672,7 +4672,7 @@ function az_default() {
   };
 }
 
-// node_modules/zod/v4/locales/be.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/be.js
 function getBelarusianPlural(count, one, few, many) {
   const absCount = Math.abs(count);
   const lastDigit = absCount % 10;
@@ -4829,7 +4829,7 @@ function be_default() {
   };
 }
 
-// node_modules/zod/v4/locales/bg.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/bg.js
 var error4 = () => {
   const Sizable = {
     string: { unit: "\u0441\u0438\u043C\u0432\u043E\u043B\u0430", verb: "\u0434\u0430 \u0441\u044A\u0434\u044A\u0440\u0436\u0430" },
@@ -4950,7 +4950,7 @@ function bg_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ca.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ca.js
 var error5 = () => {
   const Sizable = {
     string: { unit: "car\xE0cters", verb: "contenir" },
@@ -5059,7 +5059,7 @@ function ca_default() {
   };
 }
 
-// node_modules/zod/v4/locales/cs.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/cs.js
 var error6 = () => {
   const Sizable = {
     string: { unit: "znak\u016F", verb: "m\xEDt" },
@@ -5171,7 +5171,7 @@ function cs_default() {
   };
 }
 
-// node_modules/zod/v4/locales/da.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/da.js
 var error7 = () => {
   const Sizable = {
     string: { unit: "tegn", verb: "havde" },
@@ -5287,7 +5287,7 @@ function da_default() {
   };
 }
 
-// node_modules/zod/v4/locales/de.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/de.js
 var error8 = () => {
   const Sizable = {
     string: { unit: "Zeichen", verb: "zu haben" },
@@ -5396,7 +5396,7 @@ function de_default() {
   };
 }
 
-// node_modules/zod/v4/locales/el.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/el.js
 var error9 = () => {
   const Sizable = {
     string: { unit: "\u03C7\u03B1\u03C1\u03B1\u03BA\u03C4\u03AE\u03C1\u03B5\u03C2", verb: "\u03BD\u03B1 \u03AD\u03C7\u03B5\u03B9" },
@@ -5506,7 +5506,7 @@ function el_default() {
   };
 }
 
-// node_modules/zod/v4/locales/en.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/en.js
 var error10 = () => {
   const Sizable = {
     string: { unit: "characters", verb: "to have" },
@@ -5619,7 +5619,7 @@ function en_default() {
   };
 }
 
-// node_modules/zod/v4/locales/eo.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/eo.js
 var error11 = () => {
   const Sizable = {
     string: { unit: "karaktrojn", verb: "havi" },
@@ -5729,7 +5729,7 @@ function eo_default() {
   };
 }
 
-// node_modules/zod/v4/locales/es.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/es.js
 var error12 = () => {
   const Sizable = {
     string: { unit: "caracteres", verb: "tener" },
@@ -5862,7 +5862,7 @@ function es_default() {
   };
 }
 
-// node_modules/zod/v4/locales/fa.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/fa.js
 var error13 = () => {
   const Sizable = {
     string: { unit: "\u06A9\u0627\u0631\u0627\u06A9\u062A\u0631", verb: "\u062F\u0627\u0634\u062A\u0647 \u0628\u0627\u0634\u062F" },
@@ -5977,7 +5977,7 @@ function fa_default() {
   };
 }
 
-// node_modules/zod/v4/locales/fi.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/fi.js
 var error14 = () => {
   const Sizable = {
     string: { unit: "merkki\xE4", subject: "merkkijonon" },
@@ -6090,7 +6090,7 @@ function fi_default() {
   };
 }
 
-// node_modules/zod/v4/locales/fr.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/fr.js
 var error15 = () => {
   const Sizable = {
     string: { unit: "caract\xE8res", verb: "avoir" },
@@ -6216,7 +6216,7 @@ function fr_default() {
   };
 }
 
-// node_modules/zod/v4/locales/fr-CA.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/fr-CA.js
 var error16 = () => {
   const Sizable = {
     string: { unit: "caract\xE8res", verb: "avoir" },
@@ -6324,7 +6324,7 @@ function fr_CA_default() {
   };
 }
 
-// node_modules/zod/v4/locales/he.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/he.js
 var error17 = () => {
   const TypeNames = {
     string: { label: "\u05DE\u05D7\u05E8\u05D5\u05D6\u05EA", gender: "f" },
@@ -6519,7 +6519,7 @@ function he_default() {
   };
 }
 
-// node_modules/zod/v4/locales/hr.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/hr.js
 var error18 = () => {
   const Sizable = {
     string: { unit: "znakova", verb: "imati" },
@@ -6642,7 +6642,7 @@ function hr_default() {
   };
 }
 
-// node_modules/zod/v4/locales/hu.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/hu.js
 var error19 = () => {
   const Sizable = {
     string: { unit: "karakter", verb: "legyen" },
@@ -6751,7 +6751,7 @@ function hu_default() {
   };
 }
 
-// node_modules/zod/v4/locales/hy.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/hy.js
 function getArmenianPlural(count, one, many) {
   return Math.abs(count) === 1 ? one : many;
 }
@@ -6899,7 +6899,7 @@ function hy_default() {
   };
 }
 
-// node_modules/zod/v4/locales/id.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/id.js
 var error21 = () => {
   const Sizable = {
     string: { unit: "karakter", verb: "memiliki" },
@@ -7006,7 +7006,7 @@ function id_default() {
   };
 }
 
-// node_modules/zod/v4/locales/is.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/is.js
 var error22 = () => {
   const Sizable = {
     string: { unit: "stafi", verb: "a\xF0 hafa" },
@@ -7116,7 +7116,7 @@ function is_default() {
   };
 }
 
-// node_modules/zod/v4/locales/it.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/it.js
 var error23 = () => {
   const Sizable = {
     string: { unit: "caratteri", verb: "avere" },
@@ -7225,7 +7225,7 @@ function it_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ja.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ja.js
 var error24 = () => {
   const Sizable = {
     string: { unit: "\u6587\u5B57", verb: "\u3067\u3042\u308B" },
@@ -7333,7 +7333,7 @@ function ja_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ka.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ka.js
 var error25 = () => {
   const Sizable = {
     string: { unit: "\u10E1\u10D8\u10DB\u10D1\u10DD\u10DA\u10DD", verb: "\u10E3\u10DC\u10D3\u10D0 \u10E8\u10D4\u10D8\u10EA\u10D0\u10D5\u10D3\u10D4\u10E1" },
@@ -7446,7 +7446,7 @@ function ka_default() {
   };
 }
 
-// node_modules/zod/v4/locales/km.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/km.js
 var error26 = () => {
   const Sizable = {
     string: { unit: "\u178F\u17BD\u17A2\u1780\u17D2\u179F\u179A", verb: "\u1782\u17BD\u179A\u1798\u17B6\u1793" },
@@ -7557,12 +7557,12 @@ function km_default() {
   };
 }
 
-// node_modules/zod/v4/locales/kh.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/kh.js
 function kh_default() {
   return km_default();
 }
 
-// node_modules/zod/v4/locales/ko.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ko.js
 var error27 = () => {
   const Sizable = {
     string: { unit: "\uBB38\uC790", verb: "to have" },
@@ -7674,7 +7674,7 @@ function ko_default() {
   };
 }
 
-// node_modules/zod/v4/locales/lt.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/lt.js
 var capitalizeFirstCharacter = (text) => {
   return text.charAt(0).toUpperCase() + text.slice(1);
 };
@@ -7878,7 +7878,7 @@ function lt_default() {
   };
 }
 
-// node_modules/zod/v4/locales/mk.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/mk.js
 var error29 = () => {
   const Sizable = {
     string: { unit: "\u0437\u043D\u0430\u0446\u0438", verb: "\u0434\u0430 \u0438\u043C\u0430\u0430\u0442" },
@@ -7988,7 +7988,7 @@ function mk_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ms.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ms.js
 var error30 = () => {
   const Sizable = {
     string: { unit: "aksara", verb: "mempunyai" },
@@ -8096,7 +8096,7 @@ function ms_default() {
   };
 }
 
-// node_modules/zod/v4/locales/nl.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/nl.js
 var error31 = () => {
   const Sizable = {
     string: { unit: "tekens", verb: "heeft" },
@@ -8207,7 +8207,7 @@ function nl_default() {
   };
 }
 
-// node_modules/zod/v4/locales/no.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/no.js
 var error32 = () => {
   const Sizable = {
     string: { unit: "tegn", verb: "\xE5 ha" },
@@ -8316,7 +8316,7 @@ function no_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ota.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ota.js
 var error33 = () => {
   const Sizable = {
     string: { unit: "harf", verb: "olmal\u0131d\u0131r" },
@@ -8426,7 +8426,7 @@ function ota_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ps.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ps.js
 var error34 = () => {
   const Sizable = {
     string: { unit: "\u062A\u0648\u06A9\u064A", verb: "\u0648\u0644\u0631\u064A" },
@@ -8541,7 +8541,7 @@ function ps_default() {
   };
 }
 
-// node_modules/zod/v4/locales/pl.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/pl.js
 var error35 = () => {
   const Sizable = {
     string: { unit: "znak\xF3w", verb: "mie\u0107" },
@@ -8651,7 +8651,7 @@ function pl_default() {
   };
 }
 
-// node_modules/zod/v4/locales/pt.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/pt.js
 var error36 = () => {
   const Sizable = {
     string: { unit: "caracteres", verb: "ter" },
@@ -8760,7 +8760,7 @@ function pt_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ro.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ro.js
 var error37 = () => {
   const Sizable = {
     string: { unit: "caractere", verb: "s\u0103 aib\u0103" },
@@ -8880,7 +8880,7 @@ function ro_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ru.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ru.js
 function getRussianPlural(count, one, few, many) {
   const absCount = Math.abs(count);
   const lastDigit = absCount % 10;
@@ -9037,7 +9037,7 @@ function ru_default() {
   };
 }
 
-// node_modules/zod/v4/locales/sl.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/sl.js
 var error39 = () => {
   const Sizable = {
     string: { unit: "znakov", verb: "imeti" },
@@ -9147,7 +9147,7 @@ function sl_default() {
   };
 }
 
-// node_modules/zod/v4/locales/sv.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/sv.js
 var error40 = () => {
   const Sizable = {
     string: { unit: "tecken", verb: "att ha" },
@@ -9258,7 +9258,7 @@ function sv_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ta.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ta.js
 var error41 = () => {
   const Sizable = {
     string: { unit: "\u0B8E\u0BB4\u0BC1\u0BA4\u0BCD\u0BA4\u0BC1\u0B95\u0BCD\u0B95\u0BB3\u0BCD", verb: "\u0B95\u0BCA\u0BA3\u0BCD\u0B9F\u0BBF\u0BB0\u0BC1\u0B95\u0BCD\u0B95 \u0BB5\u0BC7\u0BA3\u0BCD\u0B9F\u0BC1\u0BAE\u0BCD" },
@@ -9369,7 +9369,7 @@ function ta_default() {
   };
 }
 
-// node_modules/zod/v4/locales/th.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/th.js
 var error42 = () => {
   const Sizable = {
     string: { unit: "\u0E15\u0E31\u0E27\u0E2D\u0E31\u0E01\u0E29\u0E23", verb: "\u0E04\u0E27\u0E23\u0E21\u0E35" },
@@ -9480,7 +9480,7 @@ function th_default() {
   };
 }
 
-// node_modules/zod/v4/locales/tr.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/tr.js
 var error43 = () => {
   const Sizable = {
     string: { unit: "karakter", verb: "olmal\u0131" },
@@ -9586,7 +9586,7 @@ function tr_default() {
   };
 }
 
-// node_modules/zod/v4/locales/uk.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/uk.js
 var error44 = () => {
   const Sizable = {
     string: { unit: "\u0441\u0438\u043C\u0432\u043E\u043B\u0456\u0432", verb: "\u043C\u0430\u0442\u0438\u043C\u0435" },
@@ -9695,12 +9695,12 @@ function uk_default() {
   };
 }
 
-// node_modules/zod/v4/locales/ua.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ua.js
 function ua_default() {
   return uk_default();
 }
 
-// node_modules/zod/v4/locales/ur.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/ur.js
 var error45 = () => {
   const Sizable = {
     string: { unit: "\u062D\u0631\u0648\u0641", verb: "\u06C1\u0648\u0646\u0627" },
@@ -9811,7 +9811,7 @@ function ur_default() {
   };
 }
 
-// node_modules/zod/v4/locales/uz.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/uz.js
 var error46 = () => {
   const Sizable = {
     string: { unit: "belgi", verb: "bo\u2018lishi kerak" },
@@ -9922,7 +9922,7 @@ function uz_default() {
   };
 }
 
-// node_modules/zod/v4/locales/vi.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/vi.js
 var error47 = () => {
   const Sizable = {
     string: { unit: "k\xFD t\u1EF1", verb: "c\xF3" },
@@ -10031,7 +10031,7 @@ function vi_default() {
   };
 }
 
-// node_modules/zod/v4/locales/zh-CN.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/zh-CN.js
 var error48 = () => {
   const Sizable = {
     string: { unit: "\u5B57\u7B26", verb: "\u5305\u542B" },
@@ -10141,7 +10141,7 @@ function zh_CN_default() {
   };
 }
 
-// node_modules/zod/v4/locales/zh-TW.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/zh-TW.js
 var error49 = () => {
   const Sizable = {
     string: { unit: "\u5B57\u5143", verb: "\u64C1\u6709" },
@@ -10249,7 +10249,7 @@ function zh_TW_default() {
   };
 }
 
-// node_modules/zod/v4/locales/yo.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/locales/yo.js
 var error50 = () => {
   const Sizable = {
     string: { unit: "\xE0mi", verb: "n\xED" },
@@ -10357,7 +10357,7 @@ function yo_default() {
   };
 }
 
-// node_modules/zod/v4/core/registries.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/registries.js
 var _a2;
 var $output = Symbol("ZodOutput");
 var $input = Symbol("ZodInput");
@@ -10407,7 +10407,7 @@ function registry() {
 (_a2 = globalThis).__zod_globalRegistry ?? (_a2.__zod_globalRegistry = registry());
 var globalRegistry = globalThis.__zod_globalRegistry;
 
-// node_modules/zod/v4/core/api.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/api.js
 // @__NO_SIDE_EFFECTS__
 function _string(Class2, params) {
   return new Class2({
@@ -11446,7 +11446,7 @@ function _stringFormat(Class2, format, fnOrRegex, _params = {}) {
   return inst;
 }
 
-// node_modules/zod/v4/core/to-json-schema.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/to-json-schema.js
 function initializeContext(params) {
   let target = params?.target ?? "draft-2020-12";
   if (target === "draft-4")
@@ -11805,7 +11805,7 @@ var createStandardJSONSchemaMethod = (schema, io, processors = {}) => (params) =
   return finalize(ctx, schema);
 };
 
-// node_modules/zod/v4/core/json-schema-processors.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/json-schema-processors.js
 var formatMap = {
   guid: "uuid",
   url: "uri",
@@ -12349,7 +12349,7 @@ function toJSONSchema(input, params) {
   return finalize(ctx, input);
 }
 
-// node_modules/zod/v4/core/json-schema-generator.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/json-schema-generator.js
 var JSONSchemaGenerator = class {
   /** @deprecated Access via ctx instead */
   get metadataRegistry() {
@@ -12424,10 +12424,10 @@ var JSONSchemaGenerator = class {
   }
 };
 
-// node_modules/zod/v4/core/json-schema.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/core/json-schema.js
 var json_schema_exports = {};
 
-// node_modules/zod/v4/classic/schemas.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/schemas.js
 var schemas_exports2 = {};
 __export(schemas_exports2, {
   ZodAny: () => ZodAny,
@@ -12598,7 +12598,7 @@ __export(schemas_exports2, {
   xor: () => xor
 });
 
-// node_modules/zod/v4/classic/checks.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/checks.js
 var checks_exports2 = {};
 __export(checks_exports2, {
   endsWith: () => _endsWith,
@@ -12632,7 +12632,7 @@ __export(checks_exports2, {
   uppercase: () => _uppercase
 });
 
-// node_modules/zod/v4/classic/iso.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/iso.js
 var iso_exports = {};
 __export(iso_exports, {
   ZodISODate: () => ZodISODate,
@@ -12673,7 +12673,7 @@ function duration2(params) {
   return _isoDuration(ZodISODuration, params);
 }
 
-// node_modules/zod/v4/classic/errors.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/errors.js
 var initializer2 = (inst, issues) => {
   $ZodError.init(inst, issues);
   inst.name = "ZodError";
@@ -12713,7 +12713,7 @@ var ZodRealError = /* @__PURE__ */ $constructor("ZodError", initializer2, {
   Parent: Error
 });
 
-// node_modules/zod/v4/classic/parse.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/parse.js
 var parse2 = /* @__PURE__ */ _parse(ZodRealError);
 var parseAsync2 = /* @__PURE__ */ _parseAsync(ZodRealError);
 var safeParse2 = /* @__PURE__ */ _safeParse(ZodRealError);
@@ -12727,7 +12727,7 @@ var safeDecode2 = /* @__PURE__ */ _safeDecode(ZodRealError);
 var safeEncodeAsync2 = /* @__PURE__ */ _safeEncodeAsync(ZodRealError);
 var safeDecodeAsync2 = /* @__PURE__ */ _safeDecodeAsync(ZodRealError);
 
-// node_modules/zod/v4/classic/schemas.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/schemas.js
 var _installedGroups = /* @__PURE__ */ new WeakMap();
 function _installLazyMethods(inst, group, methods) {
   const proto = Object.getPrototypeOf(inst);
@@ -14017,7 +14017,7 @@ function preprocess(fn, schema) {
   });
 }
 
-// node_modules/zod/v4/classic/compat.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/compat.js
 var ZodIssueCode = {
   invalid_type: "invalid_type",
   too_big: "too_big",
@@ -14043,7 +14043,7 @@ var ZodFirstPartyTypeKind;
 /* @__PURE__ */ (function(ZodFirstPartyTypeKind2) {
 })(ZodFirstPartyTypeKind || (ZodFirstPartyTypeKind = {}));
 
-// node_modules/zod/v4/classic/from-json-schema.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/from-json-schema.js
 var z = {
   ...schemas_exports2,
   ...checks_exports2,
@@ -14523,7 +14523,7 @@ function fromJSONSchema(schema, params) {
   return convertSchema(normalized, ctx);
 }
 
-// node_modules/zod/v4/classic/coerce.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/coerce.js
 var coerce_exports = {};
 __export(coerce_exports, {
   bigint: () => bigint3,
@@ -14548,7 +14548,7 @@ function date4(params) {
   return _coercedDate(ZodDate, params);
 }
 
-// node_modules/zod/v4/classic/external.js
+// node_modules/.pnpm/zod@4.4.3/node_modules/zod/v4/classic/external.js
 config(en_default());
 
 // src/model.ts
@@ -14573,6 +14573,7 @@ var storedSchema = external_exports.object({
   publicHistory: external_exports.array(publicEventSchema).max(900).default([]),
   localIdentityId: external_exports.string().uuid().optional(),
   notificationsEnabled: external_exports.boolean().default(false),
+  entryNotificationsEnabled: external_exports.boolean().default(false),
   selectedRoom: roomIdSchema.default("general"),
   inboxUrls: external_exports.array(external_exports.string().max(256)).max(3).default([]),
   announcementAt: external_exports.number().int().nonnegative().default(0)
@@ -14624,15 +14625,16 @@ var MessageNotifications = class {
         this.initialized = true;
         return;
       }
-      if (!batch.enabled || typeof Notification === "undefined" || Notification.permission !== "granted") return;
+      if (!batch.enabled && !batch.entryEnabled || typeof Notification === "undefined" || Notification.permission !== "granted") return;
       const groups = /* @__PURE__ */ new Map();
-      for (const item of fresh) if (Date.now() / 1e3 - item.createdAt < 60 && !this.isReading(item)) groups.set(item.room ?? item.peer ?? item.id, item);
+      for (const item of fresh) if ((item.kind === "entry" ? batch.entryEnabled : batch.enabled) && Date.now() / 1e3 - item.createdAt < 60 && !this.isReading(item)) groups.set(`${item.kind ?? "message"}:${item.room ?? item.peer ?? item.id}`, item);
       for (const [key, item] of groups) {
         if (Date.now() - (this.lastShown.get(key) ?? 0) < 1e4) continue;
         this.lastShown.set(key, Date.now());
         try {
           const room = ROOMS.find((r) => r.id === item.room);
-          const notification = new Notification(room ? `DSH \u642D\u5B50 \xB7 ${room.name}` : "DSH \u642D\u5B50 \xB7 \u79C1\u4FE1", { body: room ? "\u623F\u95F4\u91CC\u6709\u65B0\u6D88\u606F\uFF0C\u70B9\u51FB\u8FD4\u56DE\u67E5\u770B\u3002" : "\u6536\u5230\u65B0\u7684\u79C1\u4FE1\uFF0C\u70B9\u51FB\u8FD4\u56DE\u67E5\u770B\u3002", tag: `dsh-friends:${key}` });
+          const entry = item.kind === "entry";
+          const notification = new Notification(room ? `DSH \u642D\u5B50 \xB7 ${room.name}` : "DSH \u642D\u5B50 \xB7 \u79C1\u4FE1", { body: entry ? `${item.name ?? "\u65B0\u642D\u5B50"} \u6765\u5230\u4E86 ${room?.name ?? "\u623F\u95F4"}\u3002` : room ? "\u623F\u95F4\u91CC\u6709\u65B0\u6D88\u606F\uFF0C\u70B9\u51FB\u8FD4\u56DE\u67E5\u770B\u3002" : "\u6536\u5230\u65B0\u7684\u79C1\u4FE1\uFF0C\u70B9\u51FB\u8FD4\u56DE\u67E5\u770B\u3002", tag: `dsh-friends:${entry ? "entry:" : ""}${key}` });
           this.open.add(notification);
           notification.onclose = () => this.open.delete(notification);
           notification.onerror = () => {
@@ -14699,7 +14701,7 @@ function Avatar({ publicKey, size = "" }) {
 }
 
 // src/version.ts
-var PLUGIN_VERSION = "0.1.0-alpha.10";
+var PLUGIN_VERSION = "0.1.0-alpha.11";
 var PLUGIN_REVISION = "memory-history-community-relay-1";
 
 // src/client.tsx
@@ -14718,7 +14720,7 @@ var React2 = __toESM(require("react"), 1);
 var import_jsx_runtime3 = require("react/jsx-runtime");
 function Lobby({ room, onRoom, onHistory, snapshot, busy, draft, setDraft, reply, setReply, onConnect, onIdentity, onPerson, onSend, onRetry }) {
   const history = React2.useRef(null), nearBottom = React2.useRef(true), [newMessages, setNewMessages] = React2.useState(false);
-  const posts = snapshot.lobby.filter((post) => (post.room ?? "general") === room), roomInfo = ROOMS.find((r) => r.id === room);
+  const posts = snapshot.lobby.filter((post) => (post.room ?? "general") === room), entries = snapshot.roomEntries.filter((entry) => entry.room === room), roomInfo = ROOMS.find((r) => r.id === room);
   const pageState = snapshot.roomHistory?.[room];
   const [loading, setLoading] = React2.useState(false);
   const loadLock = React2.useRef(false), anchor = React2.useRef();
@@ -14785,7 +14787,8 @@ function Lobby({ room, onRoom, onHistory, snapshot, busy, draft, setDraft, reply
       /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("small", { children: "\u516C\u5171\u804A\u5929\u5BA4" }),
       ROOMS.map((item) => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("button", { "aria-current": room === item.id ? "page" : void 0, disabled: busy || loading, onClick: () => onRoom(item.id), children: [
         "# ",
-        item.name
+        item.name,
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: snapshot.roomOnline[item.id] || "" })
       ] }, item.id)),
       /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { children: "\u5148\u5728\u623F\u95F4\u91CC\u804A\u804A\uFF0C\u60F3\u5355\u72EC\u4EA4\u6D41\u65F6\u518D\u53D1\u8D77\u79C1\u804A\u3002" })
     ] }),
@@ -14798,10 +14801,16 @@ function Lobby({ room, onRoom, onHistory, snapshot, busy, draft, setDraft, reply
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "df-status", children: snapshot.historyPolicy === "memory-24h" ? "\u5927\u5385\u8FD1\u671F\u6D88\u606F\u4EC5\u5728\u5185\u5B58\u7F13\u5B58\uFF1A\u6BCF\u623F\u95F4100\u6761\u3001\u6700\u591A24\u5C0F\u65F6\uFF0C\u91CD\u542F\u6E05\u7A7A\u3002" : "\u5206\u4EAB\u60F3\u6CD5\uFF0C\u9047\u89C1\u540C\u8DEF\u4EBA\u3002" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "df-actions", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(Button, { className: "df-connection-pill", "aria-label": connected ? "\u8FDE\u63A5\u72B6\u6001" : "\u8FDB\u5165\u5927\u5385", size: "sm", variant: "ghost", disabled: busy, onClick: onConnect, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: connected ? "df-ready-dot" : "df-offline-dot" }),
-          connected ? "\u5DF2\u8FDE\u63A5" : "\u8FDB\u5165\u5927\u5385"
-        ] }) })
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "df-actions", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "df-status", children: [
+            snapshot.roomOnline[room] || 0,
+            " \u4EBA\u5728\u7EBF"
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(Button, { className: "df-connection-pill", "aria-label": connected ? "\u8FDE\u63A5\u72B6\u6001" : "\u8FDB\u5165\u5927\u5385", size: "sm", variant: "ghost", disabled: busy, onClick: onConnect, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: connected ? "df-ready-dot" : "df-offline-dot" }),
+            connected ? "\u5DF2\u8FDE\u63A5" : "\u8FDB\u5165\u5927\u5385"
+          ] })
+        ] })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "df-lobby-history", "aria-label": "\u5927\u5385\u804A\u5929\u8BB0\u5F55", ref: history, onScroll: () => {
         const el = history.current;
@@ -14821,6 +14830,31 @@ function Lobby({ room, onRoom, onHistory, snapshot, busy, draft, setDraft, reply
             snapshot.historyPolicy === "memory-24h" ? "\u672C\u673A\u8BB0\u5F55 + \u4E2D\u7EE7\u8FD1\u671F\u5185\u5B58\u7F13\u5B58" : "\u516C\u5171\u8BB0\u5F55\u4EE5\u4E2D\u7EE7\u4FDD\u7559\u60C5\u51B5\u4E3A\u51C6"
           ] })
         ] }),
+        connected && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("article", { className: "df-lobby-post df-reception-welcome", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Avatar, { publicKey: "dsh-friends-reception" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "df-lobby-copy", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "df-post-head", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("strong", { children: "\u642D\u5B50\u63A5\u5F85\u52A9\u624B" }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("small", { children: "\u81EA\u52A8\u6B22\u8FCE" })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "df-public-bubble", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "df-public-text", children: "\u6B22\u8FCE\u6765\u5750\u5750 \u{1F44B} \u8FD9\u91CC\u53EF\u4EE5\u804A DSH\u3001\u5206\u4EAB\u4F5C\u54C1\u3001\u95EE\u95EE\u9898\u3002\u4F60\u6700\u8FD1\u5728\u6298\u817E\u4EC0\u4E48\uFF1F" }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "df-welcome-actions", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Button, { size: "sm", onClick: () => setDraft("\u5927\u5BB6\u597D\uFF0C\u6211\u6700\u8FD1\u5728\u7528 DSH \u505A\u2026\u2026"), children: "\u4ECB\u7ECD\u81EA\u5DF1" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Button, { size: "sm", onClick: () => setDraft("\u6211\u521A\u505A\u4E86\u4E00\u4E2A\u4F5C\u54C1\uFF0C\u60F3\u548C\u5927\u5BB6\u5206\u4EAB\uFF1A"), children: "\u5206\u4EAB\u4F5C\u54C1" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Button, { size: "sm", onClick: () => setDraft("\u8BF7\u95EE\u5927\u5BB6\uFF0C"), children: "\u95EE\u4E2A\u95EE\u9898" })
+              ] })
+            ] })
+          ] })
+        ] }),
+        entries.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "df-room-entry", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { children: [
+            entry.name,
+            " \u6765\u5230\u4E86 #",
+            roomInfo.name
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("time", { children: new Date(entry.createdAt * 1e3).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" }) })
+        ] }, entry.id)),
         !posts.length && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "df-empty", children: [
           /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h2", { children: connected ? snapshot.historyPolicy === "memory-24h" ? "\u52A0\u5165\u5B9E\u65F6\u804A\u5929" : "\u8FD9\u91CC\u8FD8\u5F88\u5B89\u9759" : "\u5148\u770B\u770B\u5927\u5BB6\u5728\u804A\u4EC0\u4E48" }),
           /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { children: connected ? snapshot.historyPolicy === "memory-24h" ? "\u8FD9\u91CC\u4F1A\u663E\u793A\u8FD1\u671F\u516C\u5F00\u6D88\u606F\uFF0C\u5DF2\u6536\u5230\u7684\u8BB0\u5F55\u4FDD\u5B58\u5728\u672C\u673A\u3002" : "\u53EF\u4EE5\u7559\u4E0B\u4F60\u7684\u7B2C\u4E00\u4E2A\u95EE\u9898\uFF0C\u6216\u5206\u4EAB\u4E00\u4E2A\u5C0F\u53D1\u73B0\u3002" : "\u8FDE\u63A5\u540E\u53EF\u63A5\u6536\u5728\u7EBF\u6D88\u606F\uFF0C\u4E0D\u9700\u8981\u5148\u52A0\u597D\u53CB\u6216\u521B\u5EFA\u53D1\u8A00\u8EAB\u4EFD\u3002" }),
@@ -14831,7 +14865,10 @@ function Lobby({ room, onRoom, onHistory, snapshot, busy, draft, setDraft, reply
           return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("article", { className: `df-lobby-post ${mine ? "mine" : ""} ${continued ? "continued" : ""}`, "data-post-id": post.id, children: [
             /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Avatar, { publicKey: post.publicKey }),
             /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "df-lobby-copy", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "df-post-head", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "df-person-name", onClick: () => onPerson({ publicKey: post.publicKey, name: post.name, bio: "", tags: [], looking: "", updatedAt: post.createdAt, expiresAt: 0, visible: false, eventId: post.id }), children: mine ? "\u4F60" : post.name }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "df-post-head", children: post.assistant ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("strong", { children: post.name }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("small", { children: "AI \u52A9\u624B" })
+              ] }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "df-person-name", onClick: () => onPerson({ publicKey: post.publicKey, name: post.name, bio: "", tags: [], looking: "", updatedAt: post.createdAt, expiresAt: 0, visible: false, eventId: post.id }), children: mine ? "\u4F60" : post.name }) }),
               /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "df-public-bubble-line", children: [
                 /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "df-public-bubble", children: [
                   post.replyTo && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("button", { className: "df-public-quote", title: parent ? `${parent.name}\uFF1A${parent.text}` : "\u8F83\u65E9\u7684\u6D88\u606F", onClick: () => {
@@ -14939,6 +14976,9 @@ var styles = `
 .dsh-friends .df-control.df-primary{background:#75408d;border-color:#75408d;color:#fff}.dsh-friends .df-control.df-primary:hover:not(:disabled){background:#623176;border-color:#623176}
 .dsh-friends .df-control.df-neutral:hover:not(:disabled){background:#f8f6fa;border-color:#b5a0c0}.dsh-friends .df-control.df-ghost{background:transparent;border-color:transparent;color:#75408d}.dsh-friends .df-control.df-ghost:hover:not(:disabled){background:#f3edf7}
 .dsh-friends .df-control:disabled{background:#eeebf0;border-color:#eeebf0;color:#a19aa6;opacity:1;cursor:default}.dsh-friends .df-control.df-ghost:disabled{background:transparent;border-color:transparent;color:#867a8e}
+.df-room-list>button{display:flex;align-items:center;gap:7px}.df-room-list>button>span{min-width:15px;text-align:center;font-size:9px;opacity:.72}
+.df-reception-welcome{margin:2px 0 8px}.df-reception-welcome .df-public-bubble{background:#fbf8fc}.df-reception-welcome .df-post-head small{color:var(--df-muted)}.df-welcome-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.df-room-entry{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--df-muted);font-size:10px;margin:0 auto 9px}.df-room-entry:before,.df-room-entry:after{content:'';width:32px;border-top:1px solid var(--df-line)}.df-room-entry time{font-size:9px}
 `;
 
 // src/client.tsx
@@ -15169,6 +15209,22 @@ function FriendsApp({ invoke }) {
       return;
     }
     act("notifications.set", { enabled: true });
+  }
+  async function toggleEntryNotifications() {
+    if (snapshot?.entryNotificationsEnabled) {
+      act("notifications.entry.set", { enabled: false });
+      return;
+    }
+    if (typeof Notification === "undefined") {
+      setError("\u5F53\u524D\u684C\u9762\u6682\u4E0D\u652F\u6301\u7CFB\u7EDF\u901A\u77E5\u3002");
+      return;
+    }
+    const permission = Notification.permission === "default" ? await Notification.requestPermission() : Notification.permission;
+    if (permission !== "granted") {
+      setError("\u7CFB\u7EDF\u901A\u77E5\u672A\u83B7\u5141\u8BB8\uFF0C\u8BF7\u5728\u7CFB\u7EDF\u6216\u6D4F\u89C8\u5668\u8BBE\u7F6E\u4E2D\u5F00\u542F\u3002");
+      return;
+    }
+    act("notifications.entry.set", { enabled: true });
   }
   const peer = snapshot?.friends.find((p) => p.publicKey === selected);
   const messages = snapshot?.messages.filter((m) => m.peer === selected) ?? [];
@@ -15435,6 +15491,14 @@ function FriendsApp({ invoke }) {
               if (snapshot.identity !== "ready") await call("identity.local");
               return call(endpoint, payload);
             }, busy })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("section", { className: "df-section", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h2", { children: "\u63D0\u9192" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("p", { children: "\u5E94\u7528\u9690\u85CF\u6216\u6700\u5C0F\u5316\u65F6\uFF0C\u53EF\u5206\u522B\u63D0\u9192\u65B0\u6D88\u606F\u548C\u6709\u4EBA\u8FDB\u5165\u5F53\u524D\u516C\u5171\u623F\u95F4\u3002" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "df-actions", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Button, { size: "sm", variant: "outline", onClick: () => void toggleNotifications(), children: snapshot.notificationsEnabled ? "\u5173\u95ED\u65B0\u6D88\u606F\u63D0\u9192" : "\u5F00\u542F\u65B0\u6D88\u606F\u63D0\u9192" }),
+              /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Button, { size: "sm", variant: "outline", onClick: () => void toggleEntryNotifications(), children: snapshot.entryNotificationsEnabled ? "\u5173\u95ED\u8FDB\u623F\u63D0\u9192" : "\u5F00\u542F\u8FDB\u623F\u63D0\u9192" })
+            ] })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("section", { className: "df-section", children: [
             /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h2", { children: "\u53EF\u89C1\u6027" }),

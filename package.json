@@ -1,6 +1,6 @@
 {
   "name": "dsh-friends",
-  "version": "0.1.0-alpha.10",
+  "version": "0.1.0-alpha.11",
   "type": "module",
   "description": "Public chat rooms, quoted replies and opt-in encrypted private text chat for DeepSeek Harness.",
   "exports": {
@@ -79,7 +79,7 @@
   "homepage": "https://github.com/techflag/dsh-friends#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/techflag/dsh-friends.git"
+    "url": "git+https://github.com/techflag/dsh-friends.git"
   },
   "author": "techflag",
   "keywords": [
@@ -88,5 +88,9 @@
     "nostr",
     "community",
     "chat"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
 }

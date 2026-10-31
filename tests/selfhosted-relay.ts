@@ -12,6 +12,7 @@ const check:unknown[]=[],stamp=randomUUID(),profile=(name:string)=>({name,bio:'�
 function store(){let value=initialStored();return {read:()=>structuredClone(value),write:async(next:Stored)=>{value=structuredClone(next)}}}
 const a=new FriendsService(store(),[url]),b=new FriendsService(store(),[url]);
 async function until(condition:()=>boolean){const end=Date.now()+12000;while(!condition()){if(Date.now()>end)throw Error('Deployment condition timed out');await new Promise(r=>setTimeout(r,100));}}
+async function untilModel(condition:()=>boolean){const end=Date.now()+35000;while(!condition()){if(Date.now()>end)throw Error('Reception model condition timed out');await new Promise(r=>setTimeout(r,100));}}
 const proof={passed:false,relay:url,stamp,checks:check,chatSentinel:'DSH_NO_SERVER_CHAT_'+stamp,privateSentinel:'DSH_PRIVATE_NO_SERVER_CHAT_'+stamp};
 try{
  for(const [client,name] of [[a,'部署验收甲'],[b,'部署验收乙']] as const){await client.command('identity.create',{password:randomUUID(),profile:profile(name)});await client.command('network.connect',{confirmed:true});}
@@ -23,12 +24,13 @@ try{
  }
  check.push('Three-room live forwarding without cross-room leakage');
  await b.command('lobby.send',{id:randomUUID(),room:'general',confirmed:true,replyTo:first,text:'合成引用回复 '+stamp});await until(()=>a.snapshot().lobby.some(p=>p.text.includes('合成引用回复 '+stamp)));check.push('Same-room quoted reply');
+ const assistantText='@接待助手 请用一句话说明你是 AI 接待助手（合成联网验收 '+stamp+'）';await a.command('lobby.send',{id:randomUUID(),room:'general',confirmed:true,text:assistantText});await until(()=>a.snapshot().lobby.some(p=>p.text===assistantText));const assistantRequest=a.snapshot().lobby.find(p=>p.text===assistantText)!.id;await untilModel(()=>a.snapshot().lobby.some(p=>p.assistant&&p.replyTo===assistantRequest));check.push('Server-side DeepSeek reception reply is signed, labelled and quoted');
  const invite=randomUUID();await a.command('friend.request',{peer:b.snapshot().publicKey,id:invite,text:'合成私聊验收'});await until(()=>b.snapshot().invitations.some(i=>i.id===invite));await b.command('friend.accept',{id:invite});await until(()=>a.snapshot().friends.length===1);
  await a.command('message.send',{peer:b.snapshot().publicKey,id:randomUUID(),text:proof.privateSentinel});await until(()=>b.snapshot().messages.some(m=>m.text===proof.privateSentinel));check.push('Invitation, acceptance and encrypted private message forwarding');
  const guest=new RelayTransport([url],()=>{});
  try{await guest.connect();const page=await guest.queryPage([{kinds:[9],limit:1000}]);assert.equal(page.complete,true);assert.ok(page.events.some(e=>e.id===first));check.push('New subscriber sees recent public messages from bounded memory cache');}finally{guest.close()}
  await b.command('network.disconnect',{});const absent='合成离线测试 '+stamp;await a.command('lobby.send',{id:randomUUID(),room:'general',confirmed:true,text:absent});await b.command('network.connect',{confirmed:true});await until(()=>b.snapshot().lobby.some(p=>p.text===absent));assert.ok(b.snapshot().lobby.some(p=>p.text.includes(proof.chatSentinel)));check.push('Reconnected client receives recent cached public messages and retains local history');
- const stats=await fetch('https://relay.techflag.cn/api/stats').then(r=>r.json()) as any;assert.ok(stats.users>=2);assert.ok(stats.messages>=before.messages+5);assert.equal(stats.chatHistoryPersisted,false);assert.equal(JSON.stringify(stats).includes(proof.chatSentinel),false);assert.equal(JSON.stringify(stats).includes(proof.privateSentinel),false);check.push('Public operational counters expose aggregates only');
+ const stats=await fetch('https://relay.techflag.cn/api/stats').then(r=>r.json()) as any;assert.ok(stats.users>=2);assert.ok(stats.messages>=before.messages+6);assert.ok(stats.reception.replied>=1);assert.ok(stats.onlineByRoom.general>=2);assert.equal(stats.chatHistoryPersisted,false);assert.equal(JSON.stringify(stats).includes(proof.chatSentinel),false);assert.equal(JSON.stringify(stats).includes(proof.privateSentinel),false);check.push('Public operational counters expose aggregates only');
  await a.close();await b.close();
  if(process.env.DSH_FRIENDS_RESTART_STAGE==='1'){
   assert.ok(process.env.DSH_FRIENDS_DEPLOY_SSH_HOST,'Explicit deployment SSH host required');

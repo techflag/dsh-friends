@@ -24,7 +24,12 @@ CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -o relay .
 
 - `DSH_RELAY_STATE`：运营统计目录，要求仅服务账户可读写。
 - `DSH_RELAY_LISTEN`：默认 `127.0.0.1:17777`；公网通过反向代理提供 TLS。
+- `DSH_RECEPTION_API_KEY`：接待助手使用的服务端 DeepSeek Key；未设置时 AI 接话关闭，公共聊天照常工作。也兼容 `DEEPSEEK_API_KEY`。
+- `DSH_RECEPTION_API_URL`：默认 `https://api.deepseek.com/chat/completions`。
+- `DSH_RECEPTION_MODEL`：默认 `deepseek-flash`。
 - 当前公开域名为 `relay.techflag.cn`，框架服务 URL 与页面连接地址需同时保持一致。
+
+API Key 只能由受限的服务配置注入，不写入 systemd 单元正文、仓库、插件包、日志或统计备份。接待助手只接收触发它的公开发言；不读取私聊、DSH 会话或工作区。进房心跳和在线快照是短时内存状态，不持久化用户列表。
 
 隐私用例检查正文、信封、原始公钥与事件 ID 不进入统计文件；重启后计数保留；新用户可读取100条/24小时范围内的公开缓存，重启后公开缓存清空，私聊历史查询始终为空；损坏的计数数据不会被静默清空。
 

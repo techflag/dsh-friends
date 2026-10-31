@@ -9,12 +9,14 @@ import { encrypt as protect, decrypt as unlock } from 'nostr-tools/nip49';
 import { getConversationKey, encrypt, decrypt } from 'nostr-tools/nip44';
 import { wrapManyEvents, unwrapEvent } from 'nostr-tools/nip59';
 import { RelayTransport } from './relays.js';
-import { CANDIDATE_RELAYS, PROFILE_KIND, PROFILE_TAG, LEASE_SECONDS, LOBBY_KIND, LOBBY_TAG, LOBBY_LIMIT, ROOMS, eventRoom, roomIdSchema, publicEventSchema, type RoomId, storedSchema, profileSchema, privateSchema, emptyPrivate, hexKey, FriendsError, demand, type Store, type Stored, type PrivateData, type Peer, type Snapshot, type Outbox } from './model.js';
+import { CANDIDATE_RELAYS, PROFILE_KIND, PROFILE_TAG, LEASE_SECONDS, LOBBY_KIND, LOBBY_TAG, LOBBY_LIMIT, PRESENCE_KIND, PRESENCE_SNAPSHOT_KIND, ROOMS, eventRoom, roomIdSchema, publicEventSchema, type RoomId, storedSchema, profileSchema, privateSchema, emptyPrivate, hexKey, FriendsError, demand, type Store, type Stored, type PrivateData, type Peer, type Snapshot, type Outbox, type RoomEntry } from './model.js';
 
 const eventSchema=z.object({id:hexKey,pubkey:hexKey,created_at:z.number().int().nonnegative(),kind:z.number().int(),tags:z.array(z.array(z.string().max(2048)).max(8)).max(30),content:z.string().max(32_000),sig:z.string().regex(/^[0-9a-f]{128}$/)});
 const announcement=z.object({protocol:z.literal('dsh-friends/1'),profile:profileSchema,visible:z.boolean(),expiresAt:z.number().int()}).strict();
 const control=z.object({protocol:z.literal('dsh-friends/1'),type:z.enum(['request','accept','text']),id:z.string().uuid(),requestId:z.string().uuid().optional(),expiresAt:z.number().int(),text:z.string().min(1).max(2000)}).strict();
 const password=z.string().min(12).max(128).refine(p=>p.trim().length>=12,'Use a longer password');
+const presencePayload=z.object({protocol:z.literal('dsh-friends/presence/1'),action:z.enum(['join','heartbeat','leave']),name:z.string().trim().min(1).max(20)}).strict();
+const presenceSnapshot=z.object({protocol:z.literal('dsh-friends/presence-snapshot/1'),rooms:z.record(roomIdSchema,z.number().int().nonnegative().max(100000))}).strict();
 const now=()=>Math.floor(Date.now()/1000);
 
 export class FriendsService {
@@ -36,10 +38,14 @@ export class FriendsService {
   private notices:MessageNotice[]=[];
   private noticeRevision=0;
   private noticeWaiters=new Set<()=>void>();
-  private noticeBatch(){return {revision:this.noticeRevision,enabled:this.stored.notificationsEnabled&&this.stored.networkApproved&&!this.closing,items:structuredClone(this.notices)};}
+  private noticeBatch(){return {revision:this.noticeRevision,enabled:this.stored.notificationsEnabled&&this.stored.networkApproved&&!this.closing,entryEnabled:this.stored.entryNotificationsEnabled&&this.stored.networkApproved&&!this.closing,items:structuredClone(this.notices)};}
   private wakeNotices(){this.noticeRevision++;for(const wake of [...this.noticeWaiters])wake();}
   private addNotice(notice:MessageNotice){this.notices=[...this.notices,notice].slice(-100);this.wakeNotices();}
   private guestBlocked=new Set<string>();
+  private roomOnline:Record<RoomId,number>={general:0,builders:0,random:0};
+  private roomEntries:RoomEntry[]=[];
+  private presenceRoom?:RoomId;
+  private presenceAt=0;
   constructor(private store:Store, urls:readonly string[]=CANDIDATE_RELAYS,private protectedIdentity?:LocalIdentityStore){
     this.stored=storedSchema.parse(store.read());
     for(const event of this.stored.publicHistory)if(this.validPublic(event))this.publicEvents.set(event.id,event);
@@ -76,10 +82,10 @@ export class FriendsService {
     for(const operation of data?.lobbyQueue??[])publicEvents.set(operation.event.id,operation.event);
     const lobby=[...publicEvents.values()].filter(e=>!data?.blocked.includes(e.pubkey)&&!this.guestBlocked.has(e.pubkey)).sort((a,b)=>a.created_at-b.created_at||a.id.localeCompare(b.id)).map(e=>{
       const operation=data?.lobbyQueue.find(o=>o.event.id===e.id);
-      return {id:e.id,room:eventRoom(e),publicKey:e.pubkey,name:e.tags.find(t=>t[0]==='name')?.[1]?.slice(0,20)||e.pubkey.slice(0,12),text:e.content,createdAt:e.created_at,...(e.tags.find(t=>t[0]==='q')?.[1]?{replyTo:e.tags.find(t=>t[0]==='q')![1]}:{}),...(operation?{status:operation.status,acceptedRelays:operation.acceptedRelays}:{})};
+      return {id:e.id,room:eventRoom(e),publicKey:e.pubkey,name:e.tags.find(t=>t[0]==='name')?.[1]?.slice(0,20)||e.pubkey.slice(0,12),text:e.content,createdAt:e.created_at,assistant:Boolean(e.tags.find(t=>t[0]==='bot'&&t[1]==='reception')),...(e.tags.find(t=>t[0]==='q')?.[1]?{replyTo:e.tags.find(t=>t[0]==='q')![1]}:{}),...(operation?{status:operation.status,acceptedRelays:operation.acceptedRelays}:{})};
     });
     const peers=data ? Object.values(data.peers).filter(p=>p.visible&&p.expiresAt>t&&!data.blocked.includes(p.publicKey)).sort((a,b)=>b.updatedAt-a.updatedAt) : [];
-    return structuredClone({runtimeVersion:PLUGIN_VERSION,runtimeRevision:PLUGIN_REVISION,historyPolicy:this.transport.urls.length>0&&this.transport.urls.every(url=>new URL(url).hostname==='relay.techflag.cn')?'memory-24h':'relay-defined',identity:!this.stored.vault?'missing':this.secret?'ready':'locked',publicKey:this.stored.publicKey,profile:this.stored.profile,discoverable:this.stored.discoverable,published:this.publishedAt>t-LEASE_SECONDS,networkApproved:this.stored.networkApproved,relays:[...this.transport.status].map(([url,state])=>({url,state,privateState:this.transport.privateStatus.get(url),route:this.transport.routes.get(url),...(this.transport.details.get(url)?{detail:this.transport.details.get(url)}:{})})),peers,invitations:data?Object.values(data.invitations).filter(i=>i.state==='pending'&&i.expiresAt>t&&!data.blocked.includes(i.peer)):[],friends:data?data.friends.map(key=>data.peers[key]??{publicKey:key,name:key.slice(0,12),bio:'',tags:[],looking:'',updatedAt:0,expiresAt:0,visible:false,eventId:''}):[],blocked:[...new Set([...(data?.blocked??[]),...this.guestBlocked])],messages:data?.messages.filter(m=>!data.blocked.includes(m.peer))??[],lobby,localIdentity:Boolean(this.stored.localIdentityId),notificationsEnabled:this.stored.notificationsEnabled,selectedRoom:this.stored.selectedRoom,roomHistory:this.roomHistory,pending:(data?.outbox.length??0)+(data?.lobbyQueue.filter(o=>o.status!=='relay-accepted').length??0),pendingIds:[...(data?.outbox.map(o=>o.id)??[]),...(data?.lobbyQueue.filter(o=>o.status!=='relay-accepted').map(o=>o.id)??[])],...(this.lastError?{error:this.lastError}:{})});
+    return structuredClone({runtimeVersion:PLUGIN_VERSION,runtimeRevision:PLUGIN_REVISION,historyPolicy:this.transport.urls.length>0&&this.transport.urls.every(url=>new URL(url).hostname==='relay.techflag.cn')?'memory-24h':'relay-defined',identity:!this.stored.vault?'missing':this.secret?'ready':'locked',publicKey:this.stored.publicKey,profile:this.stored.profile,discoverable:this.stored.discoverable,published:this.publishedAt>t-LEASE_SECONDS,networkApproved:this.stored.networkApproved,relays:[...this.transport.status].map(([url,state])=>({url,state,privateState:this.transport.privateStatus.get(url),route:this.transport.routes.get(url),...(this.transport.details.get(url)?{detail:this.transport.details.get(url)}:{})})),peers,invitations:data?Object.values(data.invitations).filter(i=>i.state==='pending'&&i.expiresAt>t&&!data.blocked.includes(i.peer)):[],friends:data?data.friends.map(key=>data.peers[key]??{publicKey:key,name:key.slice(0,12),bio:'',tags:[],looking:'',updatedAt:0,expiresAt:0,visible:false,eventId:''}):[],blocked:[...new Set([...(data?.blocked??[]),...this.guestBlocked])],messages:data?.messages.filter(m=>!data.blocked.includes(m.peer))??[],lobby,localIdentity:Boolean(this.stored.localIdentityId),notificationsEnabled:this.stored.notificationsEnabled,entryNotificationsEnabled:this.stored.entryNotificationsEnabled,selectedRoom:this.stored.selectedRoom,roomOnline:this.roomOnline,roomEntries:this.roomEntries.filter(entry=>entry.createdAt>t-300).slice(-20),roomHistory:this.roomHistory,pending:(data?.outbox.length??0)+(data?.lobbyQueue.filter(o=>o.status!=='relay-accepted').length??0),pendingIds:[...(data?.outbox.map(o=>o.id)??[]),...(data?.lobbyQueue.filter(o=>o.status!=='relay-accepted').map(o=>o.id)??[])],...(this.lastError?{error:this.lastError}:{})});
   }
   async command(endpoint:string,payload:unknown,signal?:AbortSignal):Promise<unknown>{
     if(endpoint==='notifications.wait'){
@@ -167,9 +173,15 @@ export class FriendsService {
       if(endpoint==='notifications.set'){
         const p=z.object({enabled:z.boolean()}).strict().parse(payload);await this.save({...this.stored,notificationsEnabled:p.enabled});this.wakeNotices();return this.snapshot();
       }
+      if(endpoint==='notifications.entry.set'){
+        const p=z.object({enabled:z.boolean()}).strict().parse(payload);await this.save({...this.stored,entryNotificationsEnabled:p.enabled});this.wakeNotices();return this.snapshot();
+      }
       if(endpoint==='room.select'){
         const p=z.object({room:roomIdSchema}).strict().parse(payload);
-        await this.save({...this.stored,selectedRoom:p.room});return this.snapshot();
+        const old=this.stored.selectedRoom;
+        await this.save({...this.stored,selectedRoom:p.room});
+        if(this.secret&&this.stored.networkApproved){if(old!==p.room)await this.publishPresence('leave',old);await this.publishPresence('join',p.room);}
+        return this.snapshot();
       }
       if(endpoint==='lobby.history'){
         const p=z.object({room:roomIdSchema}).strict().parse(payload);
@@ -265,6 +277,7 @@ export class FriendsService {
         if([...this.transport.status.values()].includes('connected')&&this.lastError?.startsWith('所有社区中继'))this.lastError=undefined;
         if(this.secret&&this.stored.discoverable&&this.publishedAt<now()-300)await this.publishProfile();
         if(this.secret&&this.stored.inboxUrls.length&&(!wasConnected||this.inboxPublishedAt<now()-60))await this.publishInbox();
+        if(this.secret&&(!wasConnected||this.presenceRoom!==this.stored.selectedRoom||this.presenceAt<now()-45))await this.publishPresence(wasConnected?'heartbeat':'join',this.stored.selectedRoom);
         await this.flushLobby();await this.flush();
       }).catch(()=>{this.lastError='社区连接暂不可用，可到设置重新连接。';}).finally(()=>{this.maintaining=false;});
     },5_000);
@@ -272,7 +285,13 @@ export class FriendsService {
     this.lastError=undefined;
     if(this.secret&&this.stored.discoverable)await this.publishProfile();
     else if(this.secret&&this.stored.inboxUrls.length)await this.publishInbox();
+    if(this.secret)await this.publishPresence('join',this.stored.selectedRoom);
     await this.flushLobby();await this.flush();
+  }
+  private async publishPresence(action:'join'|'heartbeat'|'leave',room:RoomId){
+    if(!this.secret||!this.stored.networkApproved||![...this.transport.status.values()].includes('connected'))return;
+    const event=finalizeEvent({kind:PRESENCE_KIND,created_at:now(),tags:[['t',ROOMS.find(r=>r.id===room)!.tag],['expiration',String(now()+90)]],content:JSON.stringify({protocol:'dsh-friends/presence/1',action,name:this.stored.profile.name})},this.key());
+    if((await this.transport.publish(event)).length){this.presenceRoom=action==='leave'?undefined:room;this.presenceAt=now();}
   }
   private async publishInbox(){
     const urls=this.transport.urls.filter(url=>this.transport.status.get(url)==='connected');
@@ -420,6 +439,20 @@ export class FriendsService {
       if(live&&event.pubkey!==this.stored.publicKey&&!this.data?.blocked.includes(event.pubkey)&&!this.guestBlocked.has(event.pubkey))this.addNotice({id:event.id,room:eventRoom(event),createdAt:now()});
       return;
     }
+    if(event.kind===PRESENCE_SNAPSHOT_KIND){
+      let value;try{value=presenceSnapshot.parse(JSON.parse(event.content));}catch{return;}
+      this.roomOnline={general:value.rooms.general??0,builders:value.rooms.builders??0,random:value.rooms.random??0};return;
+    }
+    if(event.kind===PRESENCE_KIND){
+      const room=eventRoom(event);if(!room||event.created_at>now()+60)return;
+      let value;try{value=presencePayload.parse(JSON.parse(event.content));}catch{return;}
+      if(live&&value.action==='join'&&event.pubkey!==this.stored.publicKey){
+        const entry={id:event.id,room,publicKey:event.pubkey,name:value.name,createdAt:event.created_at};
+        if(!this.roomEntries.some(row=>row.id===event.id))this.roomEntries=[...this.roomEntries,entry].slice(-20);
+        if(this.stored.entryNotificationsEnabled)this.addNotice({id:event.id,room,createdAt:now(),kind:'entry',name:value.name});
+      }
+      return;
+    }
     if(!this.secret||!this.data||event.pubkey===this.stored.publicKey)return;
     if(event.kind===PROFILE_KIND){
       if(event.created_at>now()+300||!event.tags.some(t=>t[0]==='d'&&t[1]===PROFILE_TAG))return;
@@ -466,5 +499,5 @@ export class FriendsService {
     if(this.timer)clearInterval(this.timer);this.timer=undefined;
     this.transport.close();this.secret?.fill(0);this.secret=undefined;this.data=undefined;this.publishedAt=0;
   }
-  async close(){this.closing=true;this.wakeNotices();if(this.timer)clearInterval(this.timer);this.transport.close();await this.chain;this.stop();this.closed=true;}
+  async close(){this.closing=true;this.wakeNotices();if(this.timer)clearInterval(this.timer);try{await this.publishPresence('leave',this.stored.selectedRoom);}catch{}this.transport.close();await this.chain;this.stop();this.closed=true;}
 }

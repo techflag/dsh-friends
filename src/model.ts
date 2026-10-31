@@ -7,6 +7,9 @@ export const PROFILE_TAG = 'dsh-friends/profile/v1';
 // NIP-78 kind 30078 is owner-private and must not be used for public discovery.
 export const PROFILE_KIND = 30388;
 export const LOBBY_KIND = 9;
+// NIP-16 ephemeral events. They are never part of room history.
+export const PRESENCE_KIND = 20009;
+export const PRESENCE_SNAPSHOT_KIND = 20010;
 export const LOBBY_TAG = 'dsh-friends-lobby-v1';
 export const LOBBY_LIMIT = 1000;
 export const ROOMS = [
@@ -21,7 +24,8 @@ export function eventRoom(event:Pick<Event,'tags'>):RoomId|undefined {
   return tags.length===1?ROOMS.find(r=>r.tag===tags[0][1])?.id:undefined;
 }
 export const publicEventSchema=z.object({id:z.string().regex(/^[0-9a-f]{64}$/),pubkey:z.string().regex(/^[0-9a-f]{64}$/),created_at:z.number().int().nonnegative(),kind:z.literal(9),tags:z.array(z.array(z.string().max(2048)).max(8)).max(30),content:z.string().max(2000),sig:z.string().regex(/^[0-9a-f]{128}$/)});
-export interface LobbyPost { id:string; room?:RoomId; publicKey:string; name:string; text:string; createdAt:number; replyTo?:string; status?:'sending'|'relay-accepted'|'failed'; acceptedRelays?:string[]; }
+export interface LobbyPost { id:string; room?:RoomId; publicKey:string; name:string; text:string; createdAt:number; replyTo?:string; assistant?:boolean; status?:'sending'|'relay-accepted'|'failed'; acceptedRelays?:string[]; }
+export interface RoomEntry { id:string; room:RoomId; publicKey:string; name:string; createdAt:number; }
 export interface LobbyOperation { id:string; event:Event; status:'sending'|'relay-accepted'|'failed'; acceptedRelays:string[]; }
 export const LEASE_SECONDS = 900;
 export const hexKey = z.string().regex(/^[0-9a-f]{64}$/);
@@ -34,12 +38,13 @@ export const storedSchema = z.object({
   publicHistory:z.array(publicEventSchema).max(900).default([]),
   localIdentityId:z.string().uuid().optional(),
   notificationsEnabled:z.boolean().default(false),
+  entryNotificationsEnabled:z.boolean().default(false),
   selectedRoom:roomIdSchema.default('general'),
   inboxUrls:z.array(z.string().max(256)).max(3).default([]),
   announcementAt:z.number().int().nonnegative().default(0),
 }).strict().refine(s=>Boolean(s.publicKey)===Boolean(s.vault),'Incomplete identity');
 export type Stored = z.infer<typeof storedSchema>;
-export const initialStored = ():Stored => ({version:1, profile:{name:'新搭子',bio:'',tags:[],looking:''},discoverable:false,networkApproved:false,announcementAt:0,inboxUrls:[],publicHistory:[],selectedRoom:'general',notificationsEnabled:false});
+export const initialStored = ():Stored => ({version:1, profile:{name:'新搭子',bio:'',tags:[],looking:''},discoverable:false,networkApproved:false,announcementAt:0,inboxUrls:[],publicHistory:[],selectedRoom:'general',notificationsEnabled:false,entryNotificationsEnabled:false});
 export interface Store { read():Stored; write(value:Stored):Promise<void>; }
 export interface Peer extends Profile { publicKey:string; updatedAt:number; expiresAt:number; visible:boolean; eventId:string; }
 export interface Invitation { id:string; peer:string; greeting:string; direction:'incoming'|'outgoing'; state:'pending'|'accepted'|'ignored'; expiresAt:number; }
@@ -62,7 +67,10 @@ export interface Snapshot {
   localIdentity:boolean;
   historyPolicy:'memory-24h'|'relay-defined';
   notificationsEnabled:boolean;
+  entryNotificationsEnabled:boolean;
   selectedRoom:RoomId;
+  roomOnline:Record<RoomId,number>;
+  roomEntries:RoomEntry[];
   roomHistory:Record<RoomId,{exhausted:boolean;loaded:boolean}>;
   pending:number; pendingIds:string[]; error?:string;
 }

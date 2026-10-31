@@ -4,11 +4,11 @@
 
 安装在官方 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 上的独立插件：公共大厅、引用回复、私聊申请和加密文字聊天。WorkDSH 是兼容宿主，不是依赖。浏览大厅无需先加好友或创建发言身份；新 Mac 用户首次发言自动准备本机身份，无需注册或设置口令；昵称可在“我”中修改。
 
-![搭子大厅界面演示，人物与对话为示例](docs/images/community-demo.png)
+![搭子大厅界面演示，人物与对话为示例](https://raw.githubusercontent.com/techflag/dsh-friends/main/docs/images/community-demo.png)
 
 [下载通用插件包](https://github.com/techflag/dsh-friends/releases) · [社区中继与公开看板](https://relay.techflag.cn/)
 
-在 DSH 原生插件管理中添加下载的 `.tgz`，启用后打开侧栏「搭子」。进入大厅先聊，聊得来再发起私聊。默认房间为大厅、插件交流和随便聊聊。
+在 DSH 原生「插件 → 添加插件」中输入 `dsh-friends`，选择 npm 官方源并安装；也可以添加下载的 `.tgz`。启用后打开侧栏「搭子」。进入大厅先聊，聊得来再发起私聊。默认房间为大厅、插件交流和随便聊聊。
 
 ## 也欢迎试试 WorkDSH
 
@@ -23,7 +23,7 @@
 
 ## 当前进度
 
-`0.1.0-alpha.10` 开发验收版，已经接入真实 Host / Client 和公共 Nostr 中继。不是只有离线设计稿，也还不是正式社交服务发行版。
+`0.1.0-alpha.11` 开发验收版，已经接入真实 Host / Client、公共 Nostr 中继、房间在线状态和接待助手。不是只有离线设计稿，也还不是正式社交服务发行版。
 
 | 验证对象 | 当前证据与边界 |
 |---|---|
@@ -38,7 +38,7 @@
 
 ## 使用方式
 
-1. 在 DSH 的插件管理添加本插件 `.tgz`，安装后启用“dsh-friends”组件，从原生侧栏打开“搭子”。
+1. 在 DSH 的「插件 → 添加插件」中输入 `dsh-friends`，选择 npm 官方源安装；也可以添加本插件 `.tgz`。安装后启用“dsh-friends”组件，从原生侧栏打开“搭子”。
 2. 进入大厅并同意连接公共中继，可以先看聊天。未加入好友、未创建发言身份也能浏览。
 3. 在已验证的 macOS 上直接发言，首次发送自动生成本机身份并由系统钥匙串保管，重开自动恢复；无需填写口令。旧版锁定身份保留在“我 → 高级恢复”中，不会覆盖。同一个通用包已加入 Windows 适配，使用当前 Windows 用户范围的 DPAPI 安全保存；后台自动读取 Windows 静态系统代理，失败原因显示在节点下方。尚待 Windows 实机安装、发言和重启验收；Linux 尚无适配。
 4. 顶部切换大厅、插件交流、随便聊聊。下方连续聊天，自己的消息靠右、别人的靠左，输入区固定底部；已有记录保存在本机；默认中继转发实时消息，并提供每房间最近100条、最多24小时的内存历史，重启清空。
@@ -74,6 +74,16 @@
 
 后文或旧验收记录中“从公共中继补载历史”描述的是旧版第三方中继行为，不适用于当前默认的实时中继。服务端源码、无内容存储检查和部署说明见 `deploy/relay`。
 
+## npm 包名安装
+
+在 DSH 桌面端「插件 → 添加插件」中填写：
+
+```text
+dsh-friends
+```
+
+选择 **npm 官方源**安装即可。需要锁定当前测试版时填写 `dsh-friends@0.1.0-alpha.11`。国内镜像可能晚于官方源同步，暂时找不到包时请先切换 npm 官方源。macOS 和 Windows 使用同一个 npm 包；具体平台支持说明见 [INSTALL.md](https://github.com/techflag/dsh-friends/blob/main/INSTALL.md)。
+
 ## 构建与安装
 
 开发与本轮测试使用 Node.js 24；构建目标为 Node.js 22，插件声明最低 Node.js 22.14。接入目标明确列出 DSH `0.2.0-rc.2`、`0.2.1-rc.2` 和 `0.2.1-rc.5`，不宣称其他版本自动兼容。
@@ -88,10 +98,10 @@ npm run build
 npm pack
 ```
 
-只生成一个通用包 `dsh-friends-0.1.0-alpha.10.tgz`，Mac 和 Windows 使用同一文件，不分别发行系统版本。安装步骤和平台实测状态见 [安装说明](INSTALL.md)。Desktop 使用各自原生插件管理安装，不能把 Web profile 当成 Desktop 安装目录。Web 通过官方 CLI 安装：
+只生成一个通用包 `dsh-friends-0.1.0-alpha.11.tgz`，Mac 和 Windows 使用同一文件，不分别发行系统版本。安装步骤和平台实测状态见 [安装说明](INSTALL.md)。Desktop 使用各自原生插件管理安装，不能把 Web profile 当成 Desktop 安装目录。Web 通过官方 CLI 安装：
 
 ```sh
-dsh plugin --profile web add /完整路径/dsh-friends-0.1.0-alpha.10.tgz
+dsh plugin --profile web add /完整路径/dsh-friends-0.1.0-alpha.11.tgz
 dsh --profile web
 ```
 
