@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,20 +7,21 @@
   <title>DSH 搭子 · 交互设计预览</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23296358'/%3E%3Cpath d='M10 13h14v10H14l-4 4zm8 5h12v10H18' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="ui-system.css">
   <script src="fixtures.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
   <div class="preview-bar">
     <div><span class="preview-dot"></span><strong>DSH 插件设计预览</strong><span class="preview-note">本地演示 · 未连接中继 · 人物均为虚构</span></div>
-    <div class="preview-tools"><button id="intro-button">首次使用流程</button><label>主题 <select id="theme" aria-label="预览主题"><option value="system">跟随系统</option><option value="light">浅色</option><option value="dark">深色</option></select></label></div>
+    <div class="preview-tools"><button id="intro-button">首次使用流程</button><span>Slack 风格 · 固定配色</span></div>
   </div>
   <div class="app-shell">
     <header class="plugin-bar" aria-label="搭子插件导航">
-      <a class="brand" href="#discover" aria-label="DSH 搭子首页"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h13v10H8l-5 4V4Z"/><path d="M16 9h5v12l-4-3h-6v-4"/></svg><strong>搭子</strong></a>
-      <nav id="navigation"></nav>
+      <a class="brand" href="#lobby" aria-label="DSH 搭子首页"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h13v10H8l-5 4V4Z"/><path d="M16 9h5v12l-4-3h-6v-4"/></svg><strong>搭子</strong></a>
+      <label class="slack-global-search"><span aria-hidden="true">⌕</span><input id="community-search" aria-label="搜索当前频道" placeholder="搜索当前频道"><kbd>⌘ K</kbd></label><nav id="navigation"></nav>
       <div class="plugin-actions">
-        <button class="self-button" data-action="profile" aria-label="编辑我的名片"><span class="avatar self small">我</span><span id="rail-name">林间</span><span id="rail-visibility" class="sr-only">名片尚未公开</span></button>
+        <button class="self-button" data-action="profile" aria-label="编辑我的名片"><span class="avatar self small"><img src="avatars/self.svg" alt="" width="28" height="28"></span><span id="rail-name">林间</span><span id="rail-visibility" class="sr-only">名片尚未公开</span></button>
       </div>
     </header>
     <main id="main" tabindex="-1"></main>

@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { resolve, sep, extname } from 'node:path';
 
 const root = resolve(fileURLToPath(new URL('../design/', import.meta.url)));
-const types = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.png': 'image/png' };
+const types = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.png': 'image/png', '.svg': 'image/svg+xml' };
 const server = createServer(async (req, res) => {
   try {
     if (!['GET', 'HEAD'].includes(req.method)) { res.writeHead(405); return res.end(); }

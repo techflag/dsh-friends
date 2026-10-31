@@ -1,0 +1,10 @@
+import { build } from 'esbuild';
+import { mkdir, writeFile, rm, readFile } from 'node:fs/promises';
+const manifest=JSON.parse(await readFile('package.json','utf8'));
+if(!(await readFile('src/version.ts','utf8')).includes("'"+manifest.version+"'"))throw new Error('Host/client version constant must match package.json');
+await rm('dist', { recursive: true, force: true });
+await mkdir('dist');
+await build({ entryPoints:['src/index.ts'], outfile:'dist/index.js', bundle:true, format:'esm', platform:'node', target:'node22', external:['@deepseek-ai/*','ws','https-proxy-agent','socks-proxy-agent'], sourcemap:true });
+const client = await build({ entryPoints:['src/client.tsx'], bundle:true, write:false, format:'cjs', platform:'browser', target:'es2022', external:['@deepseek-ai/*','react','react/jsx-runtime'] });
+await writeFile('dist/client.browser.js', `window.__ModuleLoader__.load({id:"dsh-friends",factory:function(require){const module={exports:{}};\n${client.outputFiles[0].text}\nreturn module.exports;}});\n`);
+console.log('Built DSH Friends Host and native Client.');

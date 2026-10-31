@@ -1,17 +1,31 @@
 # 通信草案 · dsh-friends/1
 
-状态：项目自定义协议提案，未分配/注册正式 kind，也未通过真实中继验证。此文档不是 Nostr 官方标准。
+状态：项目自定义协议 v1 的实现草案。已通过真实回环中继及本机独立宿主经公共中继的读写、引用和加密私聊验证；不同物理网络尚未验收。本协议不是 Nostr 官方标准。
+
+## 公共大厅（已实现）
+
+产品方向调整为先公共交流，再选择私聊。大厅采用 [NIP-C7](https://github.com/nostr-protocol/nips/blob/master/C7.md) 的 kind 9 明文聊天事件与 q 引用回复；以单字母 t 标签 `dsh-friends-lobby-v1` 约定本应用大厅范围，该命名空间是本项目约定，并非官方标准房间标识。真实写入、ACK 和跨宿主收取已验证，不能因此承诺所有中继永远接受。
+
+只读连接不以好友关系或已解锁身份为前置条件。公开发言才需要签名身份；不因此自动发布完整发现名片。收到的大厅消息必须验签、限长、去重、限制数量、尊重本地屏蔽。公开消息和现有加密私聊必须使用不同载体及 UI 提示，发送确认不能混用。
+
+大厅为公开文本，与下文的名片/加密私聊载体分开。离线示例和实际网络结果分别记录。
 
 ## 原则与规范来源
 
 - 采用 [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md) 事件、签名和订阅格式，验证事件后再使用。
-- 私聊拟遵循 [NIP-17](https://github.com/nostr-protocol/nips/blob/master/17.md)，使用 [NIP-44](https://github.com/nostr-protocol/nips/blob/master/44.md) 和 [NIP-59](https://github.com/nostr-protocol/nips/blob/master/59.md)。不自造加密算法。
+- 私聊采用 [NIP-17](https://github.com/nostr-protocol/nips/blob/master/17.md)，使用 [NIP-44](https://github.com/nostr-protocol/nips/blob/master/44.md) 和 [NIP-59](https://github.com/nostr-protocol/nips/blob/master/59.md)。不自造加密算法。
 - 需要过期提示时遵循 [NIP-40](https://github.com/nostr-protocol/nips/blob/master/40.md)，仅向支持节点发布；客户端仍独立剔除过期记录。过期不是互联网副本删除保证。
 - 私信接收节点取收件方有效 kind 10050。没有该配置则提示未准备好，不能把发现节点直接当成收件节点。
 
+## 中继身份验证
+
+使用 [NIP-42](https://github.com/nostr-protocol/nips/blob/master/42.md)。只有身份已解锁且用户同意连接，Host 才为候选节点签署 kind 22242、空正文、匹配当前中继 URL 与挑战、时间有效的验证事件。验证不通过 EVENT 广播。公私分开订阅，收到 auth-required 后验证并重新订阅私信；失败不关闭公共聊天。公开状态显示 WebSocket/大厅可用情况，私聊就绪状态另外显示。
+
 ## 发现名片
 
-待评估使用自定义 addressable kind（30000–39999 范围内选定无已知冲突值）与 `d=dsh-friends/profile/v1`。查询使用单字母索引标签，如 `#d`；不能假定多字母 `#app` 会被中继索引。
+目前采用实验性 addressable kind 30388，与 `d=dsh-friends/profile/v1`、内容中的 `protocol=dsh-friends/1` 双重区分。30388 不是已注册的 NIP 类型，也不保证没有其他实验项目使用；正式公网发布前需检查冲突并完成协议验收。
+
+不使用 NIP-78 的 30078：当前 NIP-78 规定中继应对这类数据进行拥有者认证并仅向本人提供，不适合作为公开可发现名片。参见 [NIP-78](https://github.com/nostr-protocol/nips/blob/master/78.md) 与 [类型列表](https://github.com/nostr-protocol/nips#event-kinds)。查询使用单字母索引标签，如 `#d`；不能假定多字母 `#app` 会被中继索引。
 
 内容包含版本、昵称、简介、兴趣、可见性、粗粒度活动租约。身份来自事件 pubkey，不信任 content 中自称的身份。验证 hash、签名、字段长度、时间偏差、命名空间和协议版本。
 
@@ -29,7 +43,7 @@
 
 ## 邀请与好友关系
 
-加密控制消息拟使用版本化 JSON envelope，放在可互操作的私信载体内；正式实现前核对 NIP-17 plain-text 内容限制、应用识别方式和其他客户端的可读退化。
+加密控制消息使用版本化 JSON envelope，封装在 NIP-17 / NIP-59 载体内。双方需支持本项目的控制协议，不能将其宣称为与所有 Nostr 聊天客户端的邀请流程兼容。
 
 ```json
 {
@@ -43,7 +57,7 @@
 
 示例仅说明字段，不是可发送的有效事件。实际时间取有效未来期限，随机 ID 用安全随机源。
 
-控制类型：request、accept、cancel。accept 指向已验证 requestId 和双方公钥；取消、过期和重复消息必须幂等。请求人和接受人的真实签名身份从解密后的经验证封装取得，不信任 envelope 中自报身份。密封事件和内层发言身份必须一致，防止伪造。
+已实现控制类型：request、accept、text；cancel 留待后续实现，不作为当前能力承诺。accept 指向已验证 requestId 和双方公钥；取消、过期和重复消息必须幂等。请求人和接受人的真实签名身份从解密后的经验证封装取得，不信任 envelope 中自报身份。密封事件和内层发言身份必须一致，防止伪造。
 
 本地关系记录：peerPubkey、requestId、direction、revision、state。接受尚未同步显示中间状态，不能提前显示双方都已确认。好友不是 Nostr 自带双向概念，由本插件握手定义；单方面关注不算加好友。
 
@@ -61,8 +75,18 @@
 
 ## 节点资格与不依赖自建服务器的前提
 
-候选只有 `wss://relay.damus.io`、`wss://relay.primal.net`、`wss://nos.lol`，不是确认可用清单。每个节点分别记录：网络连通、NIP-11、认证要求、大小/频率限制、自定义发现事件 ACK 与可回查、加密收件 ACK 与订阅、重连回放、费用和保留政策。
+候选只有 `wss://relay.damus.io`、`wss://relay.primal.net`、`wss://nos.lol`。本轮三个候选在 DSH 官方代理下握手成功，但不是已通过协议验收的清单。每个节点分别记录：网络连通、NIP-11、认证要求、大小/频率限制、自定义发现事件 ACK 与可回查、加密收件 ACK 与订阅、重连回放、费用和保留政策。
 
 选择共同发现集合不等于节点自动互相同步。消息按接收方路由；参与方没有共同发现节点时可能互相看不到。界面要说明发现范围，不承诺全网在线目录。
 
 若候选不能同时满足可靠发现与私聊，应提交验证结果和替代决策（更换节点或可选自建），不能为“免服务器”目标假装验收成功。
+
+## 默认多房间与历史加载（2026-10-31，本地实现）
+
+保留 kind 9 / q 引用。三个默认房间的 t 标签分别为：大厅 `dsh-friends-lobby-v1`（兼容旧版）、插件交流 `dsh-friends-builders-v1`、随便聊聊 `dsh-friends-random-v1`。只接收恰好一个已知房间标签；发言与引用须同房间；操作 ID 重试也核对房间。暂不提供创建频道。
+
+实时订阅分别读取各房间近期 50 条。`lobby.history` 按房间查询更早记录，不再限制 30 天。由于 Nostr until 包含该秒，翻页先补齐边界秒才推进游标；边界秒数据超过 1000 或查询超时/中继断开时明确失败，不静默跳过。每房间单次运行最多加载 1000 条，达到上限明确说明。EOSE 仅表示当前中继查询结束，不等于互联网没有其他历史。
+
+Host 的 storageDomain 新增公开消息缓存：每房间最近 300 条验签后的原始公共事件，以及最后选择的房间。它是本地公开文本缓存（不是私信），无须解锁身份即可查看；恢复时再次验签并排除过期事件。私钥、私信和待发队列原有加密保护不变。缓存有界，不等于长期完整归档或多设备同步。
+
+UI 按房间过滤、保留本次界面会话的各房间草稿；点击或向上滚动加载更早记录，按原可见消息定位保持阅读位置。关闭期间的新发言在重新订阅后补入。本地首次全中继失败也启动维护重连。
