@@ -76,13 +76,21 @@
 
 ## npm 包名安装
 
-在 DSH 桌面端「插件 → 添加插件」中填写：
+在 **DSH Desktop** 中按下面步骤安装：
+
+1. 打开左侧「插件」。
+2. 点击「添加插件」。
+3. 把安装源切换成 **npm 官方源（registry.npmjs.org）**。
+4. 在输入框中完整填写：
 
 ```text
-dsh-friends
+dsh-friends@0.1.0-alpha.11
 ```
 
-选择 **npm 官方源**安装即可。需要锁定当前测试版时填写 `dsh-friends@0.1.0-alpha.11`。国内镜像可能晚于官方源同步，暂时找不到包时请先切换 npm 官方源。macOS 和 Windows 使用同一个 npm 包；具体平台支持说明见 [INSTALL.md](https://github.com/techflag/dsh-friends/blob/main/INSTALL.md)。
+5. 点击「安装」，安装后在插件详情中点击「启用」。
+6. 完整退出并重新打开 DSH Desktop；从左侧栏进入「搭子」。
+
+如果页面提示“该插件已安装”，先回到插件列表查看版本。已经是 `0.1.0-alpha.11` 时无需重复安装，只需启用并重启；旧版本需要先卸载再重新安装。国内镜像可能晚于官方源同步，暂时找不到版本时请切换 npm 官方源。macOS 和 Windows 使用同一个 npm 包；具体平台支持说明见 [INSTALL.md](https://github.com/techflag/dsh-friends/blob/main/INSTALL.md)。
 
 ## 构建与安装
 
