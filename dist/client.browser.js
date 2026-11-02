@@ -14743,8 +14743,8 @@ function Avatar({ publicKey, size = "" }) {
 }
 
 // src/version.ts
-var PLUGIN_VERSION = "0.1.0-alpha.11";
-var PLUGIN_REVISION = "memory-history-community-relay-1";
+var PLUGIN_VERSION = "0.1.0-alpha.12";
+var PLUGIN_REVISION = "unread-message-badges-1";
 
 // src/client.tsx
 var React3 = __toESM(require("react"), 1);

@@ -23,7 +23,7 @@
 
 ## 当前进度
 
-`0.1.0-alpha.11` 开发验收版，已经接入真实 Host / Client、公共 Nostr 中继、房间在线状态和接待助手。不是只有离线设计稿，也还不是正式社交服务发行版。
+`0.1.0-alpha.12` 开发预览版，已经接入真实 Host / Client、公共 Nostr 中继、房间在线状态、接待助手和未读消息提醒。不是只有离线设计稿，也还不是正式社交服务发行版。
 
 | 验证对象 | 当前证据与边界 |
 |---|---|
@@ -84,13 +84,13 @@
 4. 在输入框中完整填写：
 
 ```text
-dsh-friends@0.1.0-alpha.11
+dsh-friends@0.1.0-alpha.12
 ```
 
 5. 点击「安装」，安装后在插件详情中点击「启用」。
 6. 完整退出并重新打开 DSH Desktop；从左侧栏进入「搭子」。
 
-如果页面提示“该插件已安装”，先回到插件列表查看版本。已经是 `0.1.0-alpha.11` 时无需重复安装，只需启用并重启；旧版本需要先卸载再重新安装。国内镜像可能晚于官方源同步，暂时找不到版本时请切换 npm 官方源。macOS 和 Windows 使用同一个 npm 包；具体平台支持说明见 [INSTALL.md](https://github.com/techflag/dsh-friends/blob/main/INSTALL.md)。
+如果页面提示“该插件已安装”，先回到插件列表查看版本。已经是 `0.1.0-alpha.12` 时无需重复安装，只需启用并重启；旧版本需要先卸载再重新安装。国内镜像可能晚于官方源同步，暂时找不到版本时请切换 npm 官方源。macOS 和 Windows 使用同一个 npm 包；具体平台支持说明见 [INSTALL.md](https://github.com/techflag/dsh-friends/blob/main/INSTALL.md)。
 
 ## 构建与安装
 
@@ -106,10 +106,10 @@ npm run build
 npm pack
 ```
 
-只生成一个通用包 `dsh-friends-0.1.0-alpha.11.tgz`，Mac 和 Windows 使用同一文件，不分别发行系统版本。安装步骤和平台实测状态见 [安装说明](INSTALL.md)。Desktop 使用各自原生插件管理安装，不能把 Web profile 当成 Desktop 安装目录。Web 通过官方 CLI 安装：
+只生成一个通用包 `dsh-friends-0.1.0-alpha.12.tgz`，Mac 和 Windows 使用同一文件，不分别发行系统版本。安装步骤和平台实测状态见 [安装说明](INSTALL.md)。Desktop 使用各自原生插件管理安装，不能把 Web profile 当成 Desktop 安装目录。Web 通过官方 CLI 安装：
 
 ```sh
-dsh plugin --profile web add /完整路径/dsh-friends-0.1.0-alpha.11.tgz
+dsh plugin --profile web add /完整路径/dsh-friends-0.1.0-alpha.12.tgz
 dsh --profile web
 ```
 
