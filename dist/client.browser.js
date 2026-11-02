@@ -14586,6 +14586,46 @@ var privateSchema = external_exports.object({ version: external_exports.literal(
 
 // src/notifications.ts
 var readingConversation = {};
+var emptyUnread = () => ({ total: 0, publicTotal: 0, privateTotal: 0, rooms: { general: 0, builders: 0, random: 0 }, peers: {} });
+var UnreadNotifications = class {
+  snapshot = emptyUnread();
+  listeners = /* @__PURE__ */ new Set();
+  signature = "";
+  subscribe = (listener) => {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  };
+  getSnapshot = () => this.snapshot;
+  sync(items = []) {
+    const messages = [...new Map(items.filter((item) => item.kind !== "entry").map((item) => [item.id, item])).values()];
+    const rooms = { general: 0, builders: 0, random: 0 }, peers = {};
+    for (const item of messages) {
+      if (item.room) rooms[item.room]++;
+      else if (item.peer) peers[item.peer] = (peers[item.peer] ?? 0) + 1;
+    }
+    const publicTotal = Object.values(rooms).reduce((sum, count) => sum + count, 0), privateTotal = Object.values(peers).reduce((sum, count) => sum + count, 0);
+    const signature = JSON.stringify([rooms, Object.entries(peers).sort()]);
+    if (signature === this.signature) return;
+    this.signature = signature;
+    this.snapshot = { total: publicTotal + privateTotal, publicTotal, privateTotal, rooms, peers };
+    for (const listener of this.listeners) listener();
+  }
+  clear(target) {
+    const next = { ...this.snapshot, rooms: { ...this.snapshot.rooms }, peers: { ...this.snapshot.peers } };
+    if (target.room) next.rooms[target.room] = 0;
+    if (target.peer) delete next.peers[target.peer];
+    next.publicTotal = Object.values(next.rooms).reduce((sum, count) => sum + count, 0);
+    next.privateTotal = Object.values(next.peers).reduce((sum, count) => sum + count, 0);
+    next.total = next.publicTotal + next.privateTotal;
+    const signature = JSON.stringify([next.rooms, Object.entries(next.peers).sort()]);
+    if (signature === this.signature) return;
+    this.signature = signature;
+    this.snapshot = next;
+    for (const listener of this.listeners) listener();
+  }
+};
+var unreadNotifications = new UnreadNotifications();
+var unreadLabel = (count) => count > 99 ? "99+" : String(count);
 var MessageNotifications = class {
   constructor(poll, isReading, openConversation, failed) {
     this.poll = poll;
@@ -14619,6 +14659,7 @@ var MessageNotifications = class {
     try {
       const batch = await this.poll();
       if (this.stopped) return;
+      unreadNotifications.sync(batch.unreadItems ?? []);
       const fresh = batch.items.filter((item) => !this.seen.has(item.id));
       this.seen = new Set(batch.items.map((item) => item.id));
       if (!this.initialized) {
@@ -14661,6 +14702,7 @@ var MessageNotifications = class {
     if (this.timer) clearTimeout(this.timer);
     for (const notification of this.open) notification.close();
     this.open.clear();
+    unreadNotifications.sync([]);
   }
 };
 
@@ -14718,7 +14760,7 @@ function Button(props) {
 // src/lobby.tsx
 var React2 = __toESM(require("react"), 1);
 var import_jsx_runtime3 = require("react/jsx-runtime");
-function Lobby({ room, onRoom, onHistory, snapshot, busy, draft, setDraft, reply, setReply, onConnect, onIdentity, onPerson, onSend, onRetry }) {
+function Lobby({ room, unreadRooms, onRoom, onHistory, snapshot, busy, draft, setDraft, reply, setReply, onConnect, onIdentity, onPerson, onSend, onRetry }) {
   const history = React2.useRef(null), nearBottom = React2.useRef(true), [newMessages, setNewMessages] = React2.useState(false);
   const posts = snapshot.lobby.filter((post) => (post.room ?? "general") === room), entries = snapshot.roomEntries.filter((entry) => entry.room === room), roomInfo = ROOMS.find((r) => r.id === room);
   const pageState = snapshot.roomHistory?.[room];
@@ -14788,7 +14830,8 @@ function Lobby({ room, onRoom, onHistory, snapshot, busy, draft, setDraft, reply
       ROOMS.map((item) => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("button", { "aria-current": room === item.id ? "page" : void 0, disabled: busy || loading, onClick: () => onRoom(item.id), children: [
         "# ",
         item.name,
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: snapshot.roomOnline[item.id] || "" })
+        unreadRooms[item.id] > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "df-unread-badge", children: unreadRooms[item.id] > 99 ? "99+" : unreadRooms[item.id] }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "df-online-count", children: snapshot.roomOnline[item.id] || "" })
       ] }, item.id)),
       /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { children: "\u5148\u5728\u623F\u95F4\u91CC\u804A\u804A\uFF0C\u60F3\u5355\u72EC\u4EA4\u6D41\u65F6\u518D\u53D1\u8D77\u79C1\u804A\u3002" })
     ] }),
@@ -14977,6 +15020,7 @@ var styles = `
 .dsh-friends .df-control.df-neutral:hover:not(:disabled){background:#f8f6fa;border-color:#b5a0c0}.dsh-friends .df-control.df-ghost{background:transparent;border-color:transparent;color:#75408d}.dsh-friends .df-control.df-ghost:hover:not(:disabled){background:#f3edf7}
 .dsh-friends .df-control:disabled{background:#eeebf0;border-color:#eeebf0;color:#a19aa6;opacity:1;cursor:default}.dsh-friends .df-control.df-ghost:disabled{background:transparent;border-color:transparent;color:#867a8e}
 .df-room-list>button{display:flex;align-items:center;gap:7px}.df-room-list>button>span{min-width:15px;text-align:center;font-size:9px;opacity:.72}
+.dsh-friends .df-unread-badge{display:inline-flex;align-items:center;justify-content:center;min-width:15px;height:15px;padding:0 4px;border-radius:9px;background:#fa5151;color:#fff;font-size:9px;font-weight:700;line-height:15px;box-sizing:border-box;opacity:1}.df-tab .df-unread-badge{margin-left:5px}.df-room-list>button>.df-unread-badge{color:#fff;opacity:1}.df-room-list>button>.df-online-count{margin-left:auto}.df-contact>.df-unread-badge{margin-left:auto;flex-shrink:0}
 .df-reception-welcome{margin:2px 0 8px}.df-reception-welcome .df-public-bubble{background:#fbf8fc}.df-reception-welcome .df-post-head small{color:var(--df-muted)}.df-welcome-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
 .df-room-entry{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--df-muted);font-size:10px;margin:0 auto 9px}.df-room-entry:before,.df-room-entry:after{content:'';width:32px;border-top:1px solid var(--df-line)}.df-room-entry time{font-size:9px}
 `;
@@ -15064,12 +15108,13 @@ function ProfileForm({ profile, call, busy }) {
     /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Button, { variant: "outline", type: "submit", disabled: busy, children: "\u4FDD\u5B58\u540D\u7247" })
   ] });
 }
-function FriendsApp({ invoke }) {
+function FriendsApp({ invoke, onReadingChange }) {
   const [snapshot, setSnapshot] = React3.useState(), [error51, setError] = React3.useState(""), [busy, setBusy] = React3.useState(false), [view, setView] = React3.useState("lobby");
   const [query, setQuery] = React3.useState(""), [tag, setTag] = React3.useState(""), [page, setPage] = React3.useState(1), [selected, setSelected] = React3.useState(""), [threadOpen, setThreadOpen] = React3.useState(false);
   const [drafts, setDrafts] = React3.useState({}), [modal, setModal] = React3.useState(), [greeting, setGreeting] = React3.useState("");
   const dialog = React3.useRef(null), history = React3.useRef(null), mounted = React3.useRef(true);
   const [identityPrompt, setIdentityPrompt] = React3.useState(false), [lobbyDraft, setLobbyDraft] = React3.useState(""), [lobbyReply, setLobbyReply] = React3.useState(), [pendingRequest, setPendingRequest] = React3.useState();
+  const unread = React3.useSyncExternalStore(unreadNotifications.subscribe, unreadNotifications.getSnapshot, unreadNotifications.getSnapshot);
   const publicOperation = React3.useRef();
   const roomDrafts = React3.useRef({});
   async function selectRoom(room) {
@@ -15170,10 +15215,11 @@ function FriendsApp({ invoke }) {
     readingConversation.view = view;
     readingConversation.room = snapshot?.selectedRoom;
     readingConversation.peer = selected;
+    onReadingChange();
     return () => {
       readingConversation.view = void 0;
     };
-  }, [view, snapshot?.selectedRoom, selected]);
+  }, [view, snapshot?.selectedRoom, selected, onReadingChange]);
   React3.useEffect(() => {
     const open = (event) => {
       const notice = event.detail;
@@ -15282,14 +15328,18 @@ function FriendsApp({ invoke }) {
     /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("style", { children: styles }),
     /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("nav", { className: "df-nav", "aria-label": "\u642D\u5B50\u63D2\u4EF6\u5BFC\u822A", children: [
       /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("strong", { children: "\u642D\u5B50" }),
-      [["lobby", "\u793E\u533A"], ["messages", "\u79C1\u4FE1"], ["friends", "\u8054\u7CFB\u4EBA"], ["settings", "\u6211"]].map(([key, label]) => /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("button", { className: "df-tab", "aria-current": view === key ? "page" : void 0, onClick: () => {
-        setView(key);
-        setIdentityPrompt(false);
-        setError("");
-      }, children: [
-        label,
-        key === "friends" && incoming.length ? ` (${incoming.length})` : ""
-      ] }, key)),
+      [["lobby", "\u793E\u533A"], ["messages", "\u79C1\u4FE1"], ["friends", "\u8054\u7CFB\u4EBA"], ["settings", "\u6211"]].map(([key, label]) => {
+        const unreadCount = key === "lobby" ? unread.publicTotal : key === "messages" ? unread.privateTotal : 0;
+        return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("button", { className: "df-tab", "aria-current": view === key ? "page" : void 0, onClick: () => {
+          setView(key);
+          setIdentityPrompt(false);
+          setError("");
+        }, children: [
+          label,
+          unreadCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "df-unread-badge", children: unreadLabel(unreadCount) }),
+          key === "friends" && incoming.length ? ` (${incoming.length})` : ""
+        ] }, key);
+      }),
       /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "df-notification-toggle", disabled: busy, title: "\u9690\u85CF\u6216\u6700\u5C0F\u5316\u65F6\u63D0\u9192\uFF1B\u90E8\u5206\u684C\u9762\u5173\u95ED\u7A97\u53E3\u540E\u4F1A\u505C\u6B62\u63D0\u9192\uFF0C\u5F7B\u5E95\u9000\u51FA\u540E\u505C\u6B62\u63A5\u6536\u3002", "aria-label": "\u65B0\u6D88\u606F\u63D0\u9192", "aria-pressed": snapshot?.notificationsEnabled ?? false, onClick: () => void toggleNotifications(), children: snapshot?.notificationsEnabled ? "\u63D0\u9192\u5DF2\u5F00\u542F" : "\u5F00\u542F\u63D0\u9192" }),
       /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "df-self df-muted", children: [
         /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Avatar, { publicKey: snapshot?.publicKey, size: "small" }),
@@ -15314,7 +15364,7 @@ function FriendsApp({ invoke }) {
         setPendingRequest(void 0);
       }, children: "\u8FD4\u56DE\u5927\u5385" }),
       /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(IdentityGate, { snapshot, call, busy })
-    ] }) : view === "lobby" ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Lobby, { room: snapshot.selectedRoom, onRoom: (room) => void selectRoom(room), onHistory: async () => {
+    ] }) : view === "lobby" ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Lobby, { room: snapshot.selectedRoom, unreadRooms: unread.rooms, onRoom: (room) => void selectRoom(room), onHistory: async () => {
       try {
         const value = await invoke("lobby.history", { room: snapshot.selectedRoom });
         if (mounted.current) setSnapshot(value);
@@ -15435,7 +15485,8 @@ function FriendsApp({ invoke }) {
           /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { children: [
             p.name,
             /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("small", { children: short(p.publicKey) })
-          ] })
+          ] }),
+          (unread.peers[p.publicKey] ?? 0) > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "df-unread-badge", children: unreadLabel(unread.peers[p.publicKey]) })
         ] }, p.publicKey)),
         !snapshot.friends.length && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "df-empty", children: [
           /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("p", { children: snapshot.identity === "locked" ? "\u672C\u673A\u65E7\u7248\u79C1\u804A\u5C1A\u672A\u6062\u590D\uFF0C\u53EF\u5230\u201C\u6211\u201D\u4E2D\u5904\u7406\uFF1B\u539F\u8BB0\u5F55\u4ECD\u4FDD\u7559\u3002" : "\u8FD8\u6CA1\u6709\u597D\u53CB\u4F1A\u8BDD\u3002" }),
@@ -15640,6 +15691,16 @@ function FriendsApp({ invoke }) {
 }
 var name = "dsh-friends-client";
 var inject = ["slots", "layout", "connection"];
+function FriendsSidebarIcon({ size }) {
+  const unread = React3.useSyncExternalStore(unreadNotifications.subscribe, unreadNotifications.getSnapshot, unreadNotifications.getSnapshot);
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { style: { position: "relative", display: "inline-flex", width: size, height: size }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.5", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M3 4h13v10H8l-5 4V4Z" }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M16 9h5v12l-4-3h-6v-4" })
+    ] }),
+    unread.total > 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { "aria-hidden": "true", style: { position: "absolute", top: -7, right: -11, minWidth: 15, height: 15, padding: "0 3px", boxSizing: "border-box", borderRadius: 8, background: "#fa5151", color: "#fff", border: "2px solid var(--dsw-alias-bg-layer-1, #fff)", font: "600 9px/11px system-ui", textAlign: "center", whiteSpace: "nowrap" }, children: unreadLabel(unread.total) })
+  ] });
+}
 function apply(ctx) {
   const lifetime = new AbortController();
   const invoke = async (endpoint, payload = {}) => {
@@ -15650,6 +15711,28 @@ function apply(ctx) {
     return result.value;
   };
   ctx.effect(() => () => lifetime.abort(), "dsh-friends.client");
+  const acknowledgeReading = () => {
+    if (document.visibilityState !== "visible" || !document.hasFocus() || ctx.layout.panelInfo.getSnapshot().activePanelId !== "dsh-friends") return;
+    const target = readingConversation.view === "lobby" && readingConversation.room ? { room: readingConversation.room } : readingConversation.view === "messages" && readingConversation.peer ? { peer: readingConversation.peer } : void 0;
+    if (!target) return;
+    const unread = unreadNotifications.getSnapshot();
+    const count = "room" in target && target.room ? unread.rooms[target.room] : "peer" in target && target.peer ? unread.peers[target.peer] ?? 0 : 0;
+    if (count === 0) return;
+    unreadNotifications.clear(target);
+    void invoke("notifications.read", target).then((batch) => unreadNotifications.sync(batch.unreadItems ?? [])).catch(() => {
+    });
+  };
+  const stopUnread = unreadNotifications.subscribe(acknowledgeReading);
+  const stopPanel = ctx.layout.panelInfo.subscribe(acknowledgeReading);
+  const onVisible = () => acknowledgeReading();
+  window.addEventListener("focus", onVisible);
+  document.addEventListener("visibilitychange", onVisible);
+  ctx.effect(() => () => {
+    stopUnread();
+    stopPanel();
+    window.removeEventListener("focus", onVisible);
+    document.removeEventListener("visibilitychange", onVisible);
+  }, "dsh-friends.unread");
   let noticeRevision;
   const notifier = new MessageNotifications(async () => {
     const batch = await invoke(noticeRevision === void 0 ? "notifications.poll" : "notifications.wait", noticeRevision === void 0 ? {} : { after: noticeRevision });
@@ -15667,13 +15750,10 @@ function apply(ctx) {
   notifier.start();
   ctx.effect(() => () => notifier.stop(), "dsh-friends.notifications");
   ctx.slots.inject("main", () => ctx.slots.inject("sidebar.panellist", () => {
-    const panel = ctx.slots.register({ name: "main", key: "dsh-friends" }, () => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(FriendsApp, { invoke }));
+    const panel = ctx.slots.register({ name: "main", key: "dsh-friends" }, () => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(FriendsApp, { invoke, onReadingChange: acknowledgeReading }));
     let entry;
     try {
-      entry = ctx.slots.register({ name: "sidebar.panellist", id: "dsh-friends", label: "\u642D\u5B50", order: 60 }, ({ size }) => /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.5", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M3 4h13v10H8l-5 4V4Z" }),
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("path", { d: "M16 9h5v12l-4-3h-6v-4" })
-      ] }));
+      entry = ctx.slots.register({ name: "sidebar.panellist", id: "dsh-friends", label: "\u642D\u5B50", order: 60 }, FriendsSidebarIcon);
     } catch (error51) {
       panel();
       throw error51;

@@ -19857,10 +19857,11 @@ var FriendsService = class {
   publicEvents = /* @__PURE__ */ new Map();
   roomHistory = { general: { exhausted: false, loaded: false }, builders: { exhausted: false, loaded: false }, random: { exhausted: false, loaded: false } };
   notices = [];
+  unreadNotices = /* @__PURE__ */ new Set();
   noticeRevision = 0;
   noticeWaiters = /* @__PURE__ */ new Set();
   noticeBatch() {
-    return { revision: this.noticeRevision, enabled: this.stored.notificationsEnabled && this.stored.networkApproved && !this.closing, entryEnabled: this.stored.entryNotificationsEnabled && this.stored.networkApproved && !this.closing, items: structuredClone(this.notices) };
+    return { revision: this.noticeRevision, enabled: this.stored.notificationsEnabled && this.stored.networkApproved && !this.closing, entryEnabled: this.stored.entryNotificationsEnabled && this.stored.networkApproved && !this.closing, items: structuredClone(this.notices), unreadItems: structuredClone(this.notices.filter((notice) => this.unreadNotices.has(notice.id))) };
   }
   wakeNotices() {
     this.noticeRevision++;
@@ -19868,6 +19869,9 @@ var FriendsService = class {
   }
   addNotice(notice) {
     this.notices = [...this.notices, notice].slice(-100);
+    if (notice.kind !== "entry") this.unreadNotices.add(notice.id);
+    const retained = new Set(this.notices.map((item) => item.id));
+    for (const id of this.unreadNotices) if (!retained.has(id)) this.unreadNotices.delete(id);
     this.wakeNotices();
   }
   guestBlocked = /* @__PURE__ */ new Set();
@@ -20058,6 +20062,19 @@ var FriendsService = class {
         return this.snapshot();
       }
       if (endpoint === "notifications.poll") return this.noticeBatch();
+      if (endpoint === "notifications.read") {
+        const p = external_exports.union([external_exports.object({ room: roomIdSchema }).strict(), external_exports.object({ peer: hexKey }).strict(), external_exports.object({ all: external_exports.literal(true) }).strict()]).parse(payload);
+        let changed = false;
+        for (const notice of this.notices) {
+          if (!this.unreadNotices.has(notice.id)) continue;
+          if ("all" in p && p.all || "room" in p && notice.room === p.room || "peer" in p && notice.peer === p.peer) {
+            this.unreadNotices.delete(notice.id);
+            changed = true;
+          }
+        }
+        if (changed) this.wakeNotices();
+        return this.noticeBatch();
+      }
       if (endpoint === "notifications.set") {
         const p = external_exports.object({ enabled: external_exports.boolean() }).strict().parse(payload);
         await this.save({ ...this.stored, notificationsEnabled: p.enabled });

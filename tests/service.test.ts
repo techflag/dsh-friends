@@ -257,10 +257,11 @@ test('notification feed excludes initial history, own events and blocked senders
     await writer.command('lobby.send',{id:randomUUID(),text:'进入之前的历史',confirmed:true});
     await reader.command('network.connect',{confirmed:true});await until(()=>reader.snapshot().lobby.length===1);
     assert.deepEqual((await reader.command('notifications.poll',{}) as {items:unknown[]}).items,[]);
-    await reader.command('notifications.set',{enabled:true});
     await writer.command('lobby.send',{id:randomUUID(),text:'进入之后的实时消息',room:'builders',confirmed:true});
     await until(()=>reader.snapshot().lobby.length===2);
-    let notices=await reader.command('notifications.poll',{}) as {enabled:boolean;items:{room:string}[]};assert(notices.enabled);assert.equal(notices.items.length,1);assert.equal(notices.items[0].room,'builders');
+    let notices=await reader.command('notifications.poll',{}) as {enabled:boolean;items:{room:string}[];unreadItems:{room:string}[]};assert.equal(notices.enabled,false);assert.equal(notices.items.length,1);assert.equal(notices.items[0].room,'builders');assert.equal(notices.unreadItems.length,1);
+    await reader.command('notifications.set',{enabled:true});notices=await reader.command('notifications.poll',{}) as typeof notices;assert(notices.enabled);
+    const read=await reader.command('notifications.read',{room:'builders'}) as {items:unknown[];unreadItems:unknown[]};assert.equal(read.items.length,1);assert.equal(read.unreadItems.length,0);
     assert.equal((await writer.command('notifications.poll',{}) as {items:unknown[]}).items.length,0);
     await reader.command('friend.block',{peer:writer.snapshot().publicKey,blocked:true});
     await writer.command('lobby.send',{id:randomUUID(),text:'屏蔽后的消息',confirmed:true});

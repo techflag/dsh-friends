@@ -36,11 +36,12 @@ export class FriendsService {
   private publicEvents=new Map<string,Event>();
   private roomHistory:Record<RoomId,{until?:number;exhausted:boolean;loaded:boolean}>={general:{exhausted:false,loaded:false},builders:{exhausted:false,loaded:false},random:{exhausted:false,loaded:false}};
   private notices:MessageNotice[]=[];
+  private unreadNotices=new Set<string>();
   private noticeRevision=0;
   private noticeWaiters=new Set<()=>void>();
-  private noticeBatch(){return {revision:this.noticeRevision,enabled:this.stored.notificationsEnabled&&this.stored.networkApproved&&!this.closing,entryEnabled:this.stored.entryNotificationsEnabled&&this.stored.networkApproved&&!this.closing,items:structuredClone(this.notices)};}
+  private noticeBatch(){return {revision:this.noticeRevision,enabled:this.stored.notificationsEnabled&&this.stored.networkApproved&&!this.closing,entryEnabled:this.stored.entryNotificationsEnabled&&this.stored.networkApproved&&!this.closing,items:structuredClone(this.notices),unreadItems:structuredClone(this.notices.filter(notice=>this.unreadNotices.has(notice.id)))};}
   private wakeNotices(){this.noticeRevision++;for(const wake of [...this.noticeWaiters])wake();}
-  private addNotice(notice:MessageNotice){this.notices=[...this.notices,notice].slice(-100);this.wakeNotices();}
+  private addNotice(notice:MessageNotice){this.notices=[...this.notices,notice].slice(-100);if(notice.kind!=='entry')this.unreadNotices.add(notice.id);const retained=new Set(this.notices.map(item=>item.id));for(const id of this.unreadNotices)if(!retained.has(id))this.unreadNotices.delete(id);this.wakeNotices();}
   private guestBlocked=new Set<string>();
   private roomOnline:Record<RoomId,number>={general:0,builders:0,random:0};
   private roomEntries:RoomEntry[]=[];
@@ -170,6 +171,12 @@ export class FriendsService {
       }
       if(endpoint==='friend.block'&&!this.secret){const p=z.object({peer:hexKey,blocked:z.boolean()}).strict().parse(payload);if(p.blocked)this.guestBlocked.add(p.peer);else this.guestBlocked.delete(p.peer);return this.snapshot();}
       if(endpoint==='notifications.poll')return this.noticeBatch();
+      if(endpoint==='notifications.read'){
+        const p=z.union([z.object({room:roomIdSchema}).strict(),z.object({peer:hexKey}).strict(),z.object({all:z.literal(true)}).strict()]).parse(payload);
+        let changed=false;
+        for(const notice of this.notices){if(!this.unreadNotices.has(notice.id))continue;if(('all' in p&&p.all)||('room' in p&&notice.room===p.room)||('peer' in p&&notice.peer===p.peer)){this.unreadNotices.delete(notice.id);changed=true;}}
+        if(changed)this.wakeNotices();return this.noticeBatch();
+      }
       if(endpoint==='notifications.set'){
         const p=z.object({enabled:z.boolean()}).strict().parse(payload);await this.save({...this.stored,notificationsEnabled:p.enabled});this.wakeNotices();return this.snapshot();
       }
